@@ -119,15 +119,18 @@ Pick by purpose; details are in the reference below.
 | A marker underline drawn under a key word, name or number. | `underline` | annotations | Use highlighter for a filled bar behind text and markerCircle to ring something. |
 | Textured paper backdrop (plain, grid, lined, dots or kraft). | `paperBg` | backgrounds | Stacking two backgrounds in one shot, or expecting it to carry content; it is only a surface. |
 | A plain colour (optionally graph-paper) backdrop when a shot needs no texture, photo, or map behind it. | `solidBg` | backgrounds | Do not stack two backgrounds in one shot; do not use it where a handmade paper look is wanted (use paperBg). |
-| A documentary photograph card for presenting historical events, important discoveries, milestones or visual evidence. | `imageTimelineCard` | cards | Do not use for full-screen photographs, complex multi-event timelines or decorative backgrounds. |
 | Short text on a torn scrap of paper, like a cut-out headline or a handwritten label: names, dates, one-line claims. | `paperScrap` | collage | Paragraphs (keep under about 8 words), more than two at once, or text that must be read for long (use quoteCard or lowerThird). |
 | A photo as an instant print: off-white frame, thicker bottom edge with a typed caption, a strip of tape on top. | `polaroid` | collage | Cutting out a person or object (use stickerCutout), more than three at once, or long captions (keep under about 40 characters). |
 | A person, place or object cut out of its photo like paper: irregular scissor-cut off-white rim, paper thickness, soft shadow, desaturated or halftone photo, optional torn backing. | `stickerCutout` | collage | More than two cutouts at once, a traced "poly" outline on hair or fine detail (supply a transparent PNG instead), or photos that need their whole frame (use paperPhoto or polaroid). |
 | A short typed label on a strip of masking tape: "EXHIBIT A", a date, a name. | `tapeLabel` | collage | Long text (keep under about 24 characters), or using it as the main title (use paperScrap or a title prop). |
 | Compare 2–6 values with paper-cut bars on a card; bars grow in and the numbers count up. | `barChart` | data | More than 8 bars, labels longer than about 10 characters, or mixed units. |
 | One huge number or year as the star of the shot, with a short label under it. | `bigNumber` | data | More than one number at once (use barChart to compare), labels longer than about 6 words, or very long values. |
+| An identity card or a passport data page with a photo, a name and up to four "LABEL \| value" rows that write on one by one. | `idCard` | documents | More than four rows, long values (keep each under about 24 characters), or two cards on screen at once. |
+| A letter on folded paper: optional date, body text that writes on line by line, optional signature at the end. | `letterPage` | documents | More than about 70 words, two letters on screen at once, or a signature without a body. |
 | A torn newspaper clipping with a serif headline and a few lines of body text. | `newspaperClip` | documents | Long articles (headline under 10 words, body under 35), two clippings at once, or leaving it on screen for more than about 4 s. |
+| A typed memo page where chosen words are blacked out with marker bars: proof of secrecy or censorship. | `redactedPage` | documents | More than about 60 words, redacting most of the text (it reads as a black block), or two pages on screen at once. |
 | A cut-paper map of a region. | `baseMap` | maps | Maps with more than 5 pins, world-scale maps (use a tight bbox), or relying on a name that is not in Natural Earth (a misspelt focus name simply highlights nothing). |
+| A photo print with a brass magnifying glass over it. | `magnifier` | photos | Photos with nothing worth zooming into, zoom above about 3.5 on a small image, or more than two spots in one shot (use two shots instead). |
 | A real photo as a taped paper print with a soft shadow and a small tilt. | `paperPhoto` | photos | Screenshots full of text, or more than two photos on screen at once. |
 | Identify a person or place with a name and an optional title. | `lowerThird` | text | Long sentences (names and short titles only), or using it for general text; use it once per person. |
 | A calendar sheet that shows one exact date: month on a coloured band, a big day number, weekday and year. | `calendarPage` | timelines | Showing several dates (use timeline), or a date without a day (use bigNumber for a year). |
@@ -411,53 +414,6 @@ _None._
 {"prop":"solidBg","slots":{},"options":{"color":"paper","grid":true},"at":"start"}
 ```
 
-### cards
-
-#### imageTimelineCard
-
-**Use:** A documentary photograph card for presenting historical events, important discoveries, milestones or visual evidence.
-
-**Do not:** Do not use for full-screen photographs, complex multi-event timelines or decorative backgrounds.
-
-_default duration 4s · space: world_
-
-**Slots** (content):
-
-| Name | Type | Notes |
-|---|---|---|
-| `image` | `asset` |  |
-| `date` | `string?` |  |
-| `title` | `string?` |  |
-| `caption` | `string?` |  |
-
-**Options:**
-
-| Name | Type | Default | Notes |
-|---|---|---|---|
-| `x` | `length?` | — |  |
-| `y` | `length?` | — |  |
-| `w` | `length?` | — |  |
-| `h` | `length?` | — |  |
-| `autoHeight` | `boolean?` | — |  |
-| `maxAutoHeight` | `length?` | — |  |
-| `rot` | `number?` | — |  |
-| `opacity` | `range:0..1?` | — |  |
-| `imageFit` | `enum:cover\|contain?` | — |  |
-| `photoRatio` | `range:0.25..0.8?` | — |  |
-| `timeline` | `boolean?` | — |  |
-| `connector` | `boolean?` | — |  |
-| `connectorGap` | `length?` | — |  |
-| `timelineSide` | `enum:left\|right?` | — |  |
-| `tape` | `boolean?` | — |  |
-| `accent` | `color?` | — |  |
-| `paperColor` | `color?` | — |  |
-
-**Example layer:**
-
-```json
-{"prop":"imageTimelineCard","slots":{"image":"foxPhoto","date":"1997","title":"A New Chapter","caption":"A moment that changed the course of history."},"options":{"x":"25%","y":"30%","autoHeight":true,"maxAutoHeight":"82%","imageFit":"cover","photoRatio":0.48,"timeline":false,"connector":true,"connectorSide":"right","connectorGap":{"portrait":"5.5%","landscape":"9%"},"timelineSide":"right","tape":true,"accent":"#B45B43","paperColor":"#F2EBDD"},"at":"start"}
-```
-
 ### collage
 
 #### paperScrap
@@ -645,6 +601,67 @@ _default duration 3s · space: world · default depth: 0.45_
 
 ### documents
 
+#### idCard
+
+**Use:** An identity card or a passport data page with a photo, a name and up to four "LABEL | value" rows that write on one by one. kind "id" has a coloured header band, "passport" is a paper page. Proof of who someone was or where they came from. Optional stamp such as EXPIRED. Without src it shows a grey silhouette. Sized from the safe area, so it fits 9:16 and 16:9.
+
+**Do not:** More than four rows, long values (keep each under about 24 characters), or two cards on screen at once.
+
+_default duration 5s · space: world · default depth: 0.5_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `name` | `string` |  |
+| `fields` | `array?` |  |
+| `src` | `asset?` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `kind` | `enum:id\|passport` | — |  |
+| `title` | `string?` | — |  |
+| `color` | `color?` | — |  |
+| `stamp` | `string?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"idCard","slots":{"name":"Chan Tai Man","fields":["BORN | 12 MAR 1961","PLACE | HONG KONG","ISSUED | 3 MAY 1996","NO. | K123456(7)"]},"options":{"kind":"id","stamp":"EXPIRED"},"at":"start"}
+```
+
+#### letterPage
+
+**Use:** A letter on folded paper: optional date, body text that writes on line by line, optional signature at the end. Proof that someone wrote or promised something. paper: plain, lined or aged. Sized from the safe area, so it fits 9:16 and 16:9.
+
+**Do not:** More than about 70 words, two letters on screen at once, or a signature without a body.
+
+_default duration 6s · space: world · default depth: 0.5_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `text` | `string` |  |
+| `date` | `string?` |  |
+| `signature` | `string?` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `paper` | `enum:plain\|lined\|aged?` | — |  |
+| `face` | `enum:serif\|typed?` | — |  |
+| `folds` | `number?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"letterPage","slots":{"date":"12 March 1984","text":"Dear Mr Chan,\n\nI write to confirm that the talks will continue through the winter.\n\nYours sincerely","signature":"Margaret"},"options":{"paper":"aged"},"at":"start"}
+```
+
 #### newspaperClip
 
 **Use:** A torn newspaper clipping with a serif headline and a few lines of body text. Proof that something was reported. Use "mark" to highlight a headline word.
@@ -673,6 +690,35 @@ _default duration 4s · space: world · default depth: 0.5_
 
 ```json
 {"prop":"newspaperClip","slots":{"headline":"HONG KONG RETURNS TO CHINA","body":"After 156 years of British rule, the territory was handed over at midnight.","source":"Morning Post · 1 July 1997"},"options":{"mark":"RETURNS"},"at":"start"}
+```
+
+#### redactedPage
+
+**Use:** A typed memo page where chosen words are blacked out with marker bars: proof of secrecy or censorship. List the words to hide in "redact". "reveal" starts covered and lifts the bars. Optional red stamp. Sized from the safe area, so it fits 9:16 and 16:9.
+
+**Do not:** More than about 60 words, redacting most of the text (it reads as a black block), or two pages on screen at once.
+
+_default duration 5s · space: world · default depth: 0.5_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `text` | `string` |  |
+| `title` | `string?` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `redact` | `array?` | — |  |
+| `stamp` | `string?` | — |  |
+| `reveal` | `boolean?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"redactedPage","slots":{"title":"MEMORANDUM","text":"On 3 May the minister Jon Smith signed the order to move the files out of the colony before the handover."},"options":{"redact":["Jon Smith","3 May"],"stamp":"CONFIDENTIAL"},"at":"start"}
 ```
 
 ### maps
@@ -706,6 +752,35 @@ _default duration 4s · space: world · default depth: 0.4_
 ```
 
 ### photos
+
+#### magnifier
+
+**Use:** A photo print with a brass magnifying glass over it. The lens zooms into one spot (focus) and can slide to a second spot (to): finding a detail, a face in a crowd, a sign on a wall. focus and to are [x,y] inside the photo, 0 to 1. Sized from the safe area, so it fits 9:16 and 16:9.
+
+**Do not:** Photos with nothing worth zooming into, zoom above about 3.5 on a small image, or more than two spots in one shot (use two shots instead).
+
+_default duration 5s · space: world · default depth: 0.5_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `src` | `asset` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `focus` | `array?` | — |  |
+| `to` | `array?` | — |  |
+| `zoom` | `number?` | — |  |
+| `look` | `enum:bw\|muted\|color\|halftone` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"magnifier","slots":{"src":"assets/sample/skyline.png"},"options":{"focus":[0.3,0.4],"to":[0.7,0.6],"zoom":2.4,"look":"bw"},"at":"start"}
+```
 
 #### paperPhoto
 
