@@ -34,7 +34,9 @@
         "pack": "node tools/pack.mjs",
         "qa": "node tools/qa.mjs",
         "slots": "node tools/slots.mjs",
-        "audit:roots": "node tools/audit-roots.mjs"
+        "audit:roots": "node tools/audit-roots.mjs",
+        "geo:names": "node tools/geo-names.mjs",
+        "brief": "node tools/brief.mjs"
     },
     "description": "Code-drawn paper-craft explainer videos. script.json -> director -> camera -> props -> canvas -> MP4.",
     "main": "index.js",

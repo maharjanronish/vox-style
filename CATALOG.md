@@ -596,7 +596,9 @@ Ready-made shot bundles. Copy the snippet into a shot and replace every `{{param
 
 ```json
 {
-  "camera": "push-in",
+  "camera": {
+    "move": "push-in"
+  },
   "layers": [
     {
       "prop": "paperBg",
@@ -635,7 +637,9 @@ Ready-made shot bundles. Copy the snippet into a shot and replace every `{{param
 
 ```json
 {
-  "camera": "push-in",
+  "camera": {
+    "move": "push-in"
+  },
   "layers": [
     {
       "prop": "paperBg",
@@ -673,7 +677,9 @@ Ready-made shot bundles. Copy the snippet into a shot and replace every `{{param
 
 ```json
 {
-  "camera": "push-in",
+  "camera": {
+    "move": "push-in"
+  },
   "layers": [
     {
       "prop": "paperBg",
@@ -709,7 +715,9 @@ Ready-made shot bundles. Copy the snippet into a shot and replace every `{{param
 
 ```json
 {
-  "camera": "push-in",
+  "camera": {
+    "move": "push-in"
+  },
   "layers": [
     {
       "prop": "paperBg",
@@ -743,7 +751,9 @@ Ready-made shot bundles. Copy the snippet into a shot and replace every `{{param
 
 ```json
 {
-  "camera": "push-in",
+  "camera": {
+    "move": "push-in"
+  },
   "layers": [
     {
       "prop": "paperBg",
