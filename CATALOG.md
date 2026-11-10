@@ -33,7 +33,7 @@ You write ONE file: `projects/<name>/script.json` (narration lines, shots, props
 - One idea per shot. Prefer a photo or a big number over a paragraph.
 
 ## Sound effects (`shot.sfx`)
-`"sfx":[{ "type": "thud", "at": "word:agreed", "gain": 0.8 }]`. `at` uses the same cue grammar as layers (`start`, `end`, `t:1.2`, `word:x`, optional `+0.2s`); `t:` is relative to the shot start.
+`"sfx": ["whoosh"]` or `[{ "type": "thud", "at": "word:agreed", "gain": 0.8 }]`. `at` uses the same cue grammar as layers (`start`, `end`, `t:1.2`, `word:x`, optional `+0.2s`); `t:` is relative to the shot start.
 Known sounds: `whoosh`, `slide`, `paper`, `swipe`, `thud`, `tick`, `pop`, `scribble`. Unknown names fall back to `tick` with a warning.
 Automatic (no need to write): stamp→thud, newspaperClip/paperPhoto/baseMap→paper, highlighter→swipe, markerCircle→scribble, bigNumber/barChart→pop, lowerThird→slide, wipe→whoosh, paperSlide→slide. Disable with `npm run sfx -- <project> --no-auto`.
 
@@ -115,6 +115,7 @@ Pick by purpose; details are in the reference below.
 | Textured paper backdrop (plain, grid, lined, dots or kraft). | `paperBg` | backgrounds | Stacking two backgrounds in one shot, or expecting it to carry content; it is only a surface. |
 | A plain colour (optionally graph-paper) backdrop when a shot needs no texture, photo, or map behind it. | `solidBg` | backgrounds | Do not stack two backgrounds in one shot; do not use it where a handmade paper look is wanted (use paperBg). |
 | A documentary photograph card for presenting historical events, important discoveries, milestones or visual evidence. | `imageTimelineCard` | cards | Do not use for full-screen photographs, complex multi-event timelines or decorative backgrounds. |
+| A person, place or object cut out of its photo like paper: irregular scissor-cut off-white rim, paper thickness, soft shadow, desaturated or halftone photo, optional torn backing. | `stickerCutout` | collage | More than two cutouts at once, a traced "poly" outline on hair or fine detail (supply a transparent PNG instead), or photos that need their whole frame (use paperPhoto). |
 | Compare 2–6 values with paper-cut bars on a card; bars grow in and the numbers count up. | `barChart` | data | More than 8 bars, labels longer than about 10 characters, or mixed units. |
 | One huge number or year as the star of the shot, with a short label under it. | `bigNumber` | data | More than one number at once (use barChart to compare), labels longer than about 6 words, or very long values. |
 | A torn newspaper clipping with a serif headline and a few lines of body text. | `newspaperClip` | documents | Long articles (headline under 10 words, body under 35), two clippings at once, or leaving it on screen for more than about 4 s. |
@@ -306,6 +307,42 @@ _default duration 4s · space: world_
 
 ```json
 {"prop":"imageTimelineCard","slots":{"image":"foxPhoto","date":"1997","title":"A New Chapter","caption":"A moment that changed the course of history."},"options":{"x":"25%","y":"30%","autoHeight":true,"maxAutoHeight":"82%","imageFit":"cover","photoRatio":0.48,"timeline":false,"connector":true,"connectorSide":"right","connectorGap":{"portrait":"5.5%","landscape":"9%"},"timelineSide":"right","tape":true,"accent":"#B45B43","paperColor":"#F2EBDD"},"at":"start"}
+```
+
+### collage
+
+#### stickerCutout
+
+**Use:** A person, place or object cut out of its photo like paper: irregular scissor-cut off-white rim, paper thickness, soft shadow, desaturated or halftone photo, optional torn backing. Best with a transparent PNG (cut "alpha"); use "scissor" for ordinary photos and "poly" to trace an outline.
+
+**Do not:** More than two cutouts at once, a traced "poly" outline on hair or fine detail (supply a transparent PNG instead), or photos that need their whole frame (use paperPhoto).
+
+_default duration 3.5s · space: world · default depth: 0.5_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `src` | `asset` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `cut` | `enum:alpha\|poly\|oval\|rect\|torn\|scissor` | — |  |
+| `points` | `array?` | — |  |
+| `ratio` | `number?` | — |  |
+| `rim` | `number?` | — |  |
+| `rough` | `number?` | — |  |
+| `look` | `enum:bw\|muted\|color\|halftone` | — |  |
+| `backing` | `enum:none\|blob\|circle\|rect` | — |  |
+| `backingColor` | `color?` | — |  |
+| `flip` | `boolean?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"stickerCutout","slots":{"src":"assets/sample/skyline.png"},"options":{"cut":"scissor","rim":10,"look":"halftone"},"at":"start"}
 ```
 
 ### data

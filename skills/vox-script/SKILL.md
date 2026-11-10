@@ -16,6 +16,7 @@ You write ONE file: `projects/<name>/script.json`. Narration lines, shots, props
 4. Freeze the narration before audio exists. Editing line text afterwards means redoing export, audio and align.
 5. Leave colour options out unless you must. Palette is fixed: paper, ink, tomato, cobalt, highlight yellow.
 6. Do not edit `CATALOG.md` (generated). After props change, run `npm run catalog`.
+7. Do not use em dashes (—) anywhere in the output.
 
 ## 1. Workflow
 ```
@@ -50,6 +51,27 @@ final     npm run make -- <p>                      # report the output path that
       { "prop": "bigNumber", "slots": { "value": "156", "label": "years of British rule" }, "at": "word:156" } ] } ]
 }
 ```
+
+## Assets manifest (required for paperPhoto, baseMap textures, etc.)
+
+ ```json
+   "assets": {
+     "myPhoto": "assets/photo.jpg",     // key → relative path from project root
+     "mapTexture": "assets/map.png"
+   },
+   "shots": [{
+     "layers": [{
+       "prop": "paperPhoto",
+       "slots": { "src": "myPhoto" }    // use the KEY, not the path
+     }]
+   }]
+ ```
+
+- The "assets" object is a preload manifest. Keys are lookup names; values are file paths.
+- paperPhoto, baseMap, and any prop with asset type slots use the key.
+- If manifest is empty, images silently render as "MISSING" placeholders.
+- Validate does NOT warn about this — only QA images reveal it.
+
 - `meta` is optional (hk1997 has none). Default format is 9:16 (1080×1920). For 16:9 see "Unverified".
 - Line ids are unique. Every line needs `id` and `text`. `say` (optional) is what is spoken when it differs; **spoken text = `say` if present, else `text`**, and every cue matches the spoken text.
 - Every line should have a shot. The director does not enforce this: a line with no shot just keeps the previous shot on screen.
