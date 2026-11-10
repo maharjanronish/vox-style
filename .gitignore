@@ -6,3 +6,7 @@ out/
 *.generated.js
 .build/
 bench-out/
+vendor/venv/
+dist/
+projects/*/build/
+projects/*/out*.mp4

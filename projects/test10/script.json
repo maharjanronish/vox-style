@@ -1,157 +1,311 @@
 {
   "meta": {
-    "title": "Paper Photo Demo",
-    "aspect": "16:9",
-    "fps": 60,
+    "title": "Nepal in 60 Seconds",
+    "aspect": "9:16",
+    "fps": 30,
     "theme": "default"
   },
   "assets": {
-    "skyline": "assets/sample/skyline.png"
+    "stupa": "assets/stupa.jpg",
+    "patan": "assets/patan.jpg",
+    "nyatapola": "assets/nyatapola.jpg",
+    "pns": "assets/pns.jpg",
+    "gurkha": "assets/gurkha.jpg",
+    "everest": "assets/everest.jpg",
+    "flag": "assets/flag.jpg"
   },
   "lines": [
     {
       "id": "l1",
-      "text": "This whole video is drawn in code, with paper, ink and a marker."
+      "text": "Tucked between India and China sits one of the oldest countries on Earth: Nepal.",
+      "say": "Tucked between India and China sits one of the oldest countries on Earth: Nepal.",
+      "caps": "Tucked between India and China|sits one of the *oldest* countries|on Earth: *Nepal*."
     },
     {
       "id": "l2",
-      "text": "A photo gets taped down, and a circle shows where to look."
+      "text": "Legend says the Kathmandu Valley was once a lake, cut open by a sage's sword.",
+      "say": "Legend says the Kathmandu Valley was once a lake, cut open by a sage's sword.",
+      "caps": "Legend says the Kathmandu Valley|was once a *lake*|cut open by a sage's sword."
     },
     {
       "id": "l3",
-      "text": "Then a name slides in at the bottom, right on cue, just like a news show."
+      "text": "Around 563 BC, the Buddha was born here, in the plains of Lumbini.",
+      "say": "Around five hundred and sixty-three B.C., the Buddha was born here, in the plains of Lumbini.",
+      "caps": "Around *563 BC*|the Buddha was born here|in the plains of Lumbini."
     },
     {
       "id": "l4",
-      "text": "That is the whole kit, so far."
+      "text": "For a thousand years, Licchavi and Malla kings carved cities of wood and brick.",
+      "say": "For a thousand years, Licchavi and Malla kings carved cities of wood and brick.",
+      "caps": "For a *thousand years*|Licchavi and Malla kings|carved cities of wood and brick."
+    },
+    {
+      "id": "l5",
+      "text": "Then in 1743, a hill prince named Prithvi Narayan Shah set out to unite them all.",
+      "say": "Then in seventeen forty-three, a hill prince named Prithvi Narayan Shah set out to unite them all.",
+      "caps": "Then in *1743*|a hill prince named|*Prithvi Narayan Shah*|set out to|unite them all."
+    },
+    {
+      "id": "l6",
+      "text": "By 1768, dozens of rival kingdoms had become a single country: Nepal.",
+      "say": "By seventeen sixty-eight, dozens of rival kingdoms had become a single country: Nepal.",
+      "caps": "By *1768*|dozens of rival kingdoms|had become a single country|*Nepal*."
+    },
+    {
+      "id": "l7",
+      "text": "In 1814, the British attacked — but the Gurkhas fought so fiercely, Nepal was never colonized.",
+      "say": "In eighteen fourteen, the British attacked — but the Gurkhas fought so fiercely, Nepal was never colonized.",
+      "caps": "In *1814* the British attacked|but the *Gurkhas* fought so fiercely|Nepal was *never colonized*."
+    },
+    {
+      "id": "l8",
+      "text": "Inside, the Rana family ruled for 104 years while kings watched from their palace.",
+      "say": "Inside, the Rana family ruled for one hundred and four years while kings watched from their palace.",
+      "caps": "Inside, the *Rana family*|ruled for *104 years*|while kings watched|from their palace."
+    },
+    {
+      "id": "l9",
+      "text": "In 1953, climbers finally stood on the roof of the world — Everest, 8,849 metres.",
+      "say": "In nineteen fifty-three, climbers finally stood on the roof of the world — Everest, eight thousand eight hundred and forty-nine metres.",
+      "caps": "In *1953*, climbers finally stood|on the *roof of the world*|Everest, *8,849* metres."
+    },
+    {
+      "id": "l10",
+      "text": "And in 2008, Nepal ended 240 years of monarchy and became a republic.",
+      "say": "And in two thousand and eight, Nepal ended two hundred and forty years of monarchy and became a republic.",
+      "caps": "And in *2008*,|Nepal ended *240 years* of monarchy|and became a *republic*."
+    },
+    {
+      "id": "l11",
+      "text": "Never colonized. Always rebuilding. The story of Nepal.",
+      "say": "Never colonized. Always rebuilding. The story of Nepal.",
+      "caps": "*Never colonized.*|*Always rebuilding.*|The story of *Nepal*."
     }
   ],
   "shots": [
     {
       "line": "l1",
-      "camera": "push-in",
+      "camera": { "move": "push-in", "amount": 1.1 },
+      "transition": { "type": "wipe", "options": { "direction": "down" }, "duration": 0.5 },
       "layers": [
+        { "prop": "paperBg", "options": { "variant": "plain" }, "depth": 0 },
         {
-          "prop": "paperBg",
-          "options": {
-            "variant": "grid"
+          "prop": "baseMap",
+          "slots": {
+            "focus": ["Nepal"],
+            "pins": [{ "lon": 85.32, "lat": 27.72, "label": "Kathmandu" }]
           },
-          "at": "start"
+          "options": { "bbox": [79.8, 26.2, 88.5, 30.6] }
         },
         {
-          "prop": "paperPhoto",
-          "slots": {
-            "src": "skyline"
-          },
-          "options": {
-            "look": "bw",
-            "y": 800
-          },
-          "at": "start"
+          "prop": "markerCircle",
+          "options": { "x": 540, "y": 795, "w": 920, "h": 500, "shape": "circle", "thickness": 8 },
+          "at": "word:oldest"
         }
       ]
     },
     {
       "line": "l2",
-      "camera": "push-in",
+      "camera": "drift",
       "layers": [
-        {
-          "prop": "paperBg",
-          "options": {
-            "variant": "lined"
-          },
-          "at": "start"
-        },
+        { "prop": "paperBg", "options": { "variant": "kraft" }, "depth": 0 },
         {
           "prop": "paperPhoto",
-          "slots": {
-            "src": "skyline",
-            "caption": "Sample skyline"
-          },
-          "options": {
-            "look": "color",
-            "y": 800
-          },
-          "at": "start"
+          "slots": { "src": "stupa", "caption": "Swayambhunath, the valley's ancient stupa" },
+          "options": { "look": "warm", "w": 660, "y": "42%" }
         },
         {
           "prop": "markerCircle",
-          "options": {
-            "x": 720,
-            "y": 900,
-            "w": 280,
-            "h": 200,
-            "shape": "circle"
-          },
-          "at": "word:circle"
+          "options": { "x": 461, "y": 902, "w": 320, "h": 240, "shape": "circle" },
+          "at": "word:once"
         }
       ]
     },
     {
       "line": "l3",
-      "camera": "drift",
+      "camera": { "move": "push-in", "amount": 1.1 },
       "layers": [
+        { "prop": "paperBg", "options": { "variant": "dots" }, "depth": 0 },
         {
-          "prop": "paperBg",
-          "options": {
-            "variant": "kraft"
-          },
-          "at": "start"
-        },
-        {
-          "prop": "paperPhoto",
-          "slots": {
-            "src": "skyline"
-          },
-          "options": {
-            "look": "duotone",
-            "y": 760
-          },
-          "at": "start"
-        },
-        {
-          "prop": "lowerThird",
-          "slots": {
-            "name": "Jane Example",
-            "title": "Narrator, sample footage"
-          },
-          "at": "word:name"
+          "prop": "bigNumber",
+          "slots": { "value": "563 BC", "label": "Siddhartha Gautama is born" }
         }
       ]
     },
     {
       "line": "l4",
-      "camera": "push-in",
+      "camera": { "move": "pan-down", "amount": 0.08 },
+      "transition": { "type": "paperSlide", "duration": 0.7 },
       "layers": [
+        { "prop": "paperBg", "options": { "variant": "grid" }, "depth": 0 },
         {
-          "prop": "paperBg",
+          "prop": "timelineTrack",
           "options": {
-            "variant": "dots"
+            "points": [
+              { "x": 0.275, "y": 0.08 },
+              { "x": 0.265, "y": 0.29 },
+              { "x": 0.285, "y": 0.58 },
+              { "x": 0.275, "y": 0.86 }
+            ],
+            "markers": [
+              { "x": 0.275, "y": 0.29 },
+              { "x": 0.275, "y": 0.58 }
+            ],
+            "color": "#B45B43",
+            "width": 5,
+            "wobble": 2,
+            "markerRadius": 14,
+            "markerBorder": 3,
+            "smoothness": 20
           },
-          "at": "start"
+          "at": "word:thousand"
         },
+        {
+          "prop": "imageTimelineCard",
+          "slots": {
+            "image": "patan",
+            "date": "c. 400 AD",
+            "title": "The Licchavi era",
+            "caption": "Temples and trade bloom in the valley"
+          },
+          "options": {
+            "x": "55%", "y": "30%", "w": "46%",
+            "autoHeight": true, "maxAutoHeight": "50%",
+            "imageFit": "cover", "photoRatio": 0.48,
+            "timeline": false, "connector": true, "connectorGap": "5.5%",
+            "timelineSide": "left", "tape": true
+          },
+          "at": "word:Licchavi"
+        },
+        {
+          "prop": "imageTimelineCard",
+          "slots": {
+            "image": "nyatapola",
+            "date": "c. 1482",
+            "title": "The Malla golden age",
+            "caption": "Three kingdoms outbuild each other in art"
+          },
+          "options": {
+            "x": "55%", "y": "62%", "w": "46%",
+            "autoHeight": true, "maxAutoHeight": "50%",
+            "imageFit": "cover", "photoRatio": 0.48,
+            "timeline": false, "connector": true, "connectorGap": "5.5%",
+            "timelineSide": "left", "tape": true
+          },
+          "at": "word:Malla"
+        }
+      ]
+    },
+    {
+      "line": "l5",
+      "camera": { "move": "push-in", "amount": 1.08 },
+      "layers": [
+        { "prop": "paperBg", "options": { "variant": "lined" }, "depth": 0 },
         {
           "prop": "paperPhoto",
-          "slots": {
-            "src": "skyline"
-          },
-          "options": {
-            "look": "warm",
-            "y": 800,
-            "rot": -3
-          },
-          "at": "start"
+          "slots": { "src": "pns" },
+          "options": { "look": "bw", "w": 720, "y": "36%" }
         },
         {
-          "prop": "markerCircle",
-          "options": {
-            "x": 540,
-            "y": 1090,
-            "w": 520,
-            "h": 60,
-            "shape": "underline"
+          "prop": "lowerThird",
+          "slots": { "name": "Prithvi Narayan Shah", "title": "King of Gorkha, from 1743" },
+          "options": { "side": "left" },
+          "at": "word:Prithvi"
+        }
+      ]
+    },
+    {
+      "line": "l6",
+      "camera": { "move": "push-in", "amount": 1.12 },
+      "layers": [
+        { "prop": "paperBg", "options": { "variant": "dots" }, "depth": 0 },
+        {
+          "prop": "bigNumber",
+          "slots": { "value": "1768", "label": "dozens of kingdoms become one Nepal" }
+        }
+      ]
+    },
+    {
+      "line": "l7",
+      "camera": { "move": "push-in", "amount": 1.06 },
+      "transition": { "type": "paperSlide", "duration": 0.7 },
+      "layers": [
+        { "prop": "paperBg", "options": { "variant": "kraft" }, "depth": 0 },
+        {
+          "prop": "paperPhoto",
+          "slots": { "src": "gurkha", "caption": "The Anglo-Nepalese War, 1814-1816" },
+          "options": { "look": "bw", "y": "40%" }
+        },
+        {
+          "prop": "stamp",
+          "slots": { "text": "NEVER COLONIZED" },
+          "options": { "shape": "box" },
+          "at": "word:never"
+        }
+      ]
+    },
+    {
+      "line": "l8",
+      "camera": { "move": "push-in", "amount": 1.1 },
+      "layers": [
+        { "prop": "paperBg", "options": { "variant": "lined" }, "depth": 0 },
+        {
+          "prop": "bigNumber",
+          "slots": { "value": "104", "label": "years of Rana rule, 1846-1951" },
+          "at": "word:ruled"
+        }
+      ]
+    },
+    {
+      "line": "l9",
+      "camera": { "move": "push-in", "amount": 1.08 },
+      "layers": [
+        { "prop": "paperBg", "options": { "variant": "plain" }, "depth": 0 },
+        {
+          "prop": "paperPhoto",
+          "slots": { "src": "everest", "caption": "Everest, first climbed in 1953" },
+          "options": { "look": "color", "y": "34%" }
+        },
+        {
+          "prop": "bigNumber",
+          "slots": { "value": "8,849 m", "label": "the height of Everest" },
+          "options": { "y": "63%" },
+          "at": "word:Everest"
+        }
+      ]
+    },
+    {
+      "line": "l10",
+      "camera": { "move": "push-in", "amount": 1.1 },
+      "transition": { "type": "wipe", "options": { "direction": "left" }, "duration": 0.5 },
+      "layers": [
+        { "prop": "paperBg", "options": { "variant": "grid" }, "depth": 0 },
+        {
+          "prop": "newspaperClip",
+          "slots": {
+            "headline": "NEPAL BECOMES A REPUBLIC",
+            "body": "After 240 years of royal rule, the assembly votes to end the monarchy.",
+            "source": "The Kathmandu Post · 29 May 2008"
           },
-          "at": "start+0.6s"
+          "options": { "mark": "REPUBLIC" }
+        }
+      ]
+    },
+    {
+      "line": "l11",
+      "camera": "drift",
+      "layers": [
+        { "prop": "paperBg", "options": { "variant": "kraft" }, "depth": 0 },
+        {
+          "prop": "paperPhoto",
+          "slots": { "src": "flag", "caption": "The world's only non-rectangular flag" },
+          "options": { "look": "color", "w": 620, "y": "42%" }
+        },
+        {
+          "prop": "stamp",
+          "slots": { "text": "NEPAL" },
+          "options": { "shape": "round", "color": "cobalt" },
+          "at": "word:story"
         }
       ]
     }

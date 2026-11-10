@@ -1,0 +1,264 @@
+{
+ "lines": [
+  {
+   "id": "l1",
+   "start": 0.3,
+   "end": 3.6,
+   "words": [
+    {
+     "w": "In",
+     "start": 0.3,
+     "end": 0.52
+    },
+    {
+     "w": "nineteen",
+     "start": 0.52,
+     "end": 0.68
+    },
+    {
+     "w": "ninety-seven,",
+     "start": 0.68,
+     "end": 1.58
+    },
+    {
+     "w": "a",
+     "start": 2.02,
+     "end": 2.14
+    },
+    {
+     "w": "newspaper",
+     "start": 2.14,
+     "end": 2.5
+    },
+    {
+     "w": "announced",
+     "start": 2.5,
+     "end": 2.92
+    },
+    {
+     "w": "the",
+     "start": 2.92,
+     "end": 3.12
+    },
+    {
+     "w": "handover.",
+     "start": 3.12,
+     "end": 3.6
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "start": 4.26,
+   "end": 7.02,
+   "words": [
+    {
+     "w": "It",
+     "start": 4.26,
+     "end": 4.36
+    },
+    {
+     "w": "ended",
+     "start": 4.36,
+     "end": 4.64
+    },
+    {
+     "w": "one",
+     "start": 4.64,
+     "end": 4.9
+    },
+    {
+     "w": "hundred",
+     "start": 4.9,
+     "end": 5.2
+    },
+    {
+     "w": "fifty-six",
+     "start": 5.2,
+     "end": 5.8
+    },
+    {
+     "w": "years",
+     "start": 5.8,
+     "end": 6.12
+    },
+    {
+     "w": "of",
+     "start": 6.12,
+     "end": 6.38
+    },
+    {
+     "w": "British",
+     "start": 6.38,
+     "end": 6.62
+    },
+    {
+     "w": "rule.",
+     "start": 6.62,
+     "end": 7.02
+    }
+   ]
+  },
+  {
+   "id": "l3",
+   "start": 7.84,
+   "end": 10.78,
+   "words": [
+    {
+     "w": "The",
+     "start": 7.84,
+     "end": 7.94
+    },
+    {
+     "w": "photo",
+     "start": 7.94,
+     "end": 8.18
+    },
+    {
+     "w": "shows",
+     "start": 8.18,
+     "end": 8.5
+    },
+    {
+     "w": "the",
+     "start": 8.5,
+     "end": 8.7
+    },
+    {
+     "w": "harbour,",
+     "start": 8.7,
+     "end": 8.96
+    },
+    {
+     "w": "and",
+     "start": 9.56,
+     "end": 9.64
+    },
+    {
+     "w": "the",
+     "start": 9.64,
+     "end": 9.74
+    },
+    {
+     "w": "stamp",
+     "start": 9.74,
+     "end": 10.04
+    },
+    {
+     "w": "says",
+     "start": 10.04,
+     "end": 10.32
+    },
+    {
+     "w": "it",
+     "start": 10.32,
+     "end": 10.5
+    },
+    {
+     "w": "all.",
+     "start": 10.5,
+     "end": 10.78
+    }
+   ]
+  },
+  {
+   "id": "l4",
+   "start": 11.48,
+   "end": 14.26,
+   "words": [
+    {
+     "w": "The",
+     "start": 11.48,
+     "end": 11.64
+    },
+    {
+     "w": "population",
+     "start": 11.64,
+     "end": 12.1
+    },
+    {
+     "w": "kept",
+     "start": 12.1,
+     "end": 12.5
+    },
+    {
+     "w": "growing,",
+     "start": 12.5,
+     "end": 12.96
+    },
+    {
+     "w": "as",
+     "start": 13.16,
+     "end": 13.28
+    },
+    {
+     "w": "this",
+     "start": 13.28,
+     "end": 13.52
+    },
+    {
+     "w": "chart",
+     "start": 13.52,
+     "end": 13.78
+    },
+    {
+     "w": "shows.",
+     "start": 13.78,
+     "end": 14.26
+    }
+   ]
+  },
+  {
+   "id": "l5",
+   "start": 14.94,
+   "end": 16.78,
+   "words": [
+    {
+     "w": "All",
+     "start": 14.94,
+     "end": 15.2
+    },
+    {
+     "w": "of",
+     "start": 15.2,
+     "end": 15.34
+    },
+    {
+     "w": "it",
+     "start": 15.34,
+     "end": 15.46
+    },
+    {
+     "w": "on",
+     "start": 15.46,
+     "end": 15.62
+    },
+    {
+     "w": "the",
+     "start": 15.62,
+     "end": 15.78
+    },
+    {
+     "w": "south",
+     "start": 15.78,
+     "end": 15.96
+    },
+    {
+     "w": "coast",
+     "start": 15.96,
+     "end": 16.24
+    },
+    {
+     "w": "of",
+     "start": 16.24,
+     "end": 16.5
+    },
+    {
+     "w": "China.",
+     "start": 16.5,
+     "end": 16.78
+    }
+   ]
+  }
+ ]
+}

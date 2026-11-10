@@ -31,3 +31,11 @@ You write ONE file: `projects/<name>/script.json` (narration lines, shots, props
 - Entrances are quick ease-outs (150–400 ms). Overshoot only on stamps and pins.
 - Palette: warm paper, one ink colour, two accents (tomato, cobalt), one highlight yellow. Leave colour options out unless you need them.
 - One idea per shot. Prefer a photo or a big number over a paragraph.
+
+## Sound effects (`shot.sfx`)
+`"sfx": ["whoosh"]` or `[{ "type": "thud", "at": "word:agreed", "gain": 0.8 }]`. `at` uses the same cue grammar as layers (`start`, `end`, `t:1.2`, `word:x`, optional `+0.2s`); `t:` is relative to the shot start.
+Known sounds: `whoosh`, `slide`, `paper`, `swipe`, `thud`, `tick`, `pop`, `scribble`. Unknown names fall back to `tick` with a warning.
+Automatic (no need to write): stamp→thud, newspaperClip/paperPhoto/baseMap→paper, highlighter→swipe, markerCircle→scribble, bigNumber/barChart→pop, lowerThird→slide, wipe→whoosh, paperSlide→slide. Disable with `npm run sfx -- <project> --no-auto`.
+
+## Writing narration lines
+Digits are fine ("1997", "6.5", "1st"). Use `say` only for pronunciation overrides. Aim for 8–12 words per line, one idea per line. Cue words (`word:x`) must be spoken in that line's text and must not be filler words.

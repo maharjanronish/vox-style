@@ -1,0 +1,55 @@
+{
+  "lines": [
+    { "id": "l1", "text": "For 156 years, Hong Kong was a British colony.", "caps": "For *156* years,|Hong Kong was a|British *colony*." },
+    { "id": "l2", "text": "It began in 1842, after China lost the Opium War." },
+    { "id": "l3", "text": "In 1898, Britain leased the New Territories for 99 years." },
+    { "id": "l4", "text": "In 1984, they agreed Hong Kong would return to China." },
+    { "id": "l5", "text": "The promise: one country, two systems." },
+    { "id": "l6", "text": "At midnight on July 1st, 1997, the flag changed.", "caps": "At midnight|on July 1st, 1997,|the *flag* changed." },
+    { "id": "l7", "text": "6.5 million people woke up under new rule." },
+    { "id": "l8", "text": "Their way of life was guaranteed for 50 years." }
+  ],
+  "shots": [
+    { "line": "l1", "camera": { "move": "push-in" }, "layers": [
+      { "prop": "paperBg" },
+      { "prop": "bigNumber", "slots": { "value": "156", "label": "years of British rule" }, "at": "word:156" },
+      { "prop": "lowerThird", "slots": { "name": "British Hong Kong", "title": "1841 – 1997" }, "at": "word:British" }
+    ] },
+    { "line": "l2", "camera": { "move": "drift" }, "layers": [
+      { "prop": "paperBg" },
+      { "prop": "newspaperClip", "slots": { "headline": "China cedes Hong Kong Island", "source": "Treaty of Nanking, 1842" }, "at": "start" },
+      { "prop": "lowerThird", "slots": { "name": "First Opium War", "title": "1839 – 1842" }, "at": "word:Opium" }
+    ] },
+    { "line": "l3", "transition": { "type": "paperSlide" }, "camera": { "move": "push-in" }, "layers": [
+      { "prop": "paperBg" },
+      { "prop": "baseMap", "slots": { "focus": ["Hong Kong"] }, "at": "start" },
+      { "prop": "markerCircle", "options": { "x": "50%", "y": "50%", "w": "34%", "h": "18%" }, "at": "word:99" }
+    ] },
+    { "line": "l4", "camera": { "move": "pan-right" }, "layers": [
+      { "prop": "paperBg" },
+      { "prop": "paperPhoto", "slots": { "src": "signing-1984.jpg", "caption": "Joint Declaration, 1984" }, "at": "start" },
+      { "prop": "stamp", "slots": { "text": "SIGNED" }, "at": "word:agreed" }
+    ] },
+    { "line": "l5", "camera": { "move": "push-in" }, "layers": [
+      { "prop": "paperBg" },
+      { "prop": "newspaperClip", "slots": { "headline": "ONE COUNTRY, TWO SYSTEMS" }, "at": "start" },
+      { "prop": "highlighter", "options": { "x": "50%", "y": "52%", "w": "55%", "h": "7%" }, "at": "word:two" }
+    ] },
+    { "line": "l6", "transition": { "type": "wipe" }, "camera": { "move": "drift" }, "sfx": [{ "type": "pop", "at": "word:flag" }], "layers": [
+      { "prop": "paperBg" },
+      { "prop": "paperPhoto", "slots": { "src": "handover-1997.jpg", "caption": "Handover ceremony, 1 July 1997" }, "at": "start" },
+      { "prop": "stamp", "slots": { "text": "1 JULY 1997" }, "at": "word:changed" }
+    ] },
+    { "line": "l7", "camera": { "move": "push-in" }, "layers": [
+      { "prop": "paperBg" },
+      { "prop": "barChart", "slots": { "title": "Hong Kong population (millions, approx.)", "data": [
+        { "label": "1971", "value": 4.0 }, { "label": "1981", "value": 5.1 }, { "label": "1991", "value": 5.8 }, { "label": "1997", "value": 6.5 } ] },
+        "options": { "highlight": 3 }, "at": "word:million" }
+    ] },
+    { "line": "l8", "camera": { "move": "pull-out" }, "layers": [
+      { "prop": "paperBg" },
+      { "prop": "bigNumber", "slots": { "value": "50", "label": "years guaranteed" }, "at": "word:50" },
+      { "prop": "lowerThird", "slots": { "name": "Until 2047", "title": "Basic Law" }, "at": "word:guaranteed" }
+    ] }
+  ]
+}

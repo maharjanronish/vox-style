@@ -1,5 +1,5 @@
 // tools/validate.mjs — check a project's script.json against the prop catalog.
-// Usage: npm run validate -- <project> [--aspect 9:16|16:9] [--json] [--no-dry-run]
+// Usage: npm run validate -- <project> [--aspect 9:16|16:9] [--json] [--no-dry-run] [--draft]
 // Exit code 1 on errors or MISSING PROPS. Warnings never fail.
 
 import fs from 'node:fs';
@@ -11,363 +11,857 @@ import { normSpec, checkValue, isRequired } from './lib/types.mjs';
 
 export const LAYER_KEYS = ['prop', 'slots', 'options', 'at', 'until', 'depth', 'z', 'space', 'enter', 'exit', 'id'];
 export const CAMERA_MOVES = ['push-in', 'pull-out', 'pan-left', 'pan-right', 'pan-up', 'pan-down', 'drift', 'tilt', 'shake', 'hold'];
+
 const UNIVERSAL_OPTIONS = ['x', 'y', 'w', 'h', 'r', 'rot', 'scale', 'opacity'];
+
 // Mirrors core/theme.js (kept literal so validate has no theme dependency).
 const FORMATS = {
   '9:16': { W: 1080, H: 1920, safe: { top: 150, bottom: 480, left: 70, right: 70 } },
   '16:9': { W: 1920, H: 1080, safe: { top: 70, bottom: 230, left: 110, right: 110 } },
 };
+
 const CUE_RE = /^(?:start|end|t:\d+(?:\.\d+)?|word:\S+?)(?:[+-]\d*\.?\d+s)?$/;
 const PLACEHOLDER = /\{\{[^}]+\}\}/;
-const TEXT_HEAVY = 40; // chars of string slot/option text
-const MAX_QUIET = 3; // seconds without a new visual
+const TEXT_HEAVY = 40;
+const MAX_QUIET = 3;
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const hasPh = (v) => PLACEHOLDER.test(JSON.stringify(v) ?? '');
-const mapSpecs = (o) => Object.fromEntries(Object.entries(o ?? {}).map(([k, v]) => [k, normSpec(v)]));
+const mapSpecs = (o) => Object.fromEntries(
+  Object.entries(o ?? {}).map(([k, v]) => [k, normSpec(v)])
+);
 
 function lev(a, b) {
   const m = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+
   for (let j = 1; j <= b.length; j++) m[0][j] = j;
-  for (let i = 1; i <= a.length; i++)
-    for (let j = 1; j <= b.length; j++)
-      m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      m[i][j] = Math.min(
+        m[i - 1][j] + 1,
+        m[i][j - 1] + 1,
+        m[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+  }
+
   return m[a.length][b.length];
 }
+
 function closest(name, list, strict = false) {
   let best = null, bd = Infinity;
+
   for (const c of list) {
     const d = lev(name.toLowerCase(), c.toLowerCase());
-    if (d < bd) { bd = d; best = c; }
+    if (d < bd) {
+      bd = d;
+      best = c;
+    }
   }
-  const limit = strict ? Math.max(1, Math.floor(name.length / 4)) : Math.max(2, Math.floor(name.length / 3));
+
+  const limit = strict
+    ? Math.max(1, Math.floor(name.length / 4))
+    : Math.max(2, Math.floor(name.length / 3));
+
   return best !== null && bd <= limit ? best : null;
 }
 
-function makeCtx({ props, aspect = '9:16', assetExists = () => true, aliases = {} }) {
-  const errors = [], warnings = [], info = [], missing = new Map();
+function makeCtx({
+  props,
+  aspect = '9:16',
+  assetExists = () => true,
+  aliases = {},
+  allowMissingAssets = false,
+}) {
+  const errors = [];
+  const warnings = [];
+  const info = [];
+  const missing = new Map();
+  const missingAssets = [];
+
   const fmt = FORMATS[aspect] ?? FORMATS['9:16'];
-  return { props, fmt, assetExists, aliases, errors, warnings, info, missing,
-    err: (m) => errors.push(m), warn: (m) => warnings.push(m) };
+
+  return {
+    props,
+    fmt,
+    assetExists,
+    aliases,
+    errors,
+    warnings,
+    info,
+    missing,
+    missingAssets,
+    allowMissingAssets,
+    err: (m) => errors.push(m),
+    warn: (m) => warnings.push(m),
+  };
 }
 
 export function makeAssetExists(root, projectDir) {
-  const dirs = [projectDir, path.join(projectDir, 'assets'), root, path.join(root, 'assets')];
-  const fn = (p) => /^(https?|data):/.test(p) || dirs.some((d) => fs.existsSync(path.join(d, p)));
+  const dirs = [
+    projectDir,
+    path.join(projectDir, 'assets'),
+    root,
+    path.join(root, 'assets'),
+  ];
+
+  const fn = (p) =>
+    /^(https?|data):/.test(p) ||
+    dirs.some((d) => fs.existsSync(path.join(d, p)));
+
   fn.dirs = dirs.map((d) => path.relative(root, d) || '.');
+
   return fn;
 }
 
 function checkCue(v, label, field, ctx) {
   if (hasPh(v)) return;
-  if (typeof v !== 'string' || !CUE_RE.test(v))
-    ctx.err(`${label}: ${field} ${JSON.stringify(v)} is not a valid cue. Use "start", "end", "t:1.5", "word:kong" or "word:the#2", optionally followed by an offset like "+0.2s" or "-0.1s".`);
+
+  if (typeof v !== 'string' || !CUE_RE.test(v)) {
+    ctx.err(
+      `${label}: ${field} ${JSON.stringify(v)} is not a valid cue. Use "start", "end", "t:1.5", "word:kong" or "word:the#2", optionally followed by an offset like "+0.2s" or "-0.1s".`
+    );
+  }
 }
 
 function resolveProp(name, label, ctx) {
   const def = ctx.props[name];
   if (def) return def;
+
   const hint = closest(name, Object.keys(ctx.props), true);
-  if (hint) ctx.err(`${label}: unknown prop "${name}" — did you mean "${hint}"?`);
-  else {
+
+  if (hint) {
+    ctx.err(`${label}: unknown prop "${name}" — did you mean "${hint}"?`);
+  } else {
     if (!ctx.missing.has(name)) ctx.missing.set(name, []);
     ctx.missing.get(name).push(label);
   }
+
   return null;
 }
 
 /** Validates slots + options of one layer/transition against meta. Returns text weight. */
 function checkBody(body, def, label, ctx) {
-  const slotSpecs = mapSpecs(def.meta?.slots), optSpecs = mapSpecs(def.meta?.options);
+  const slotSpecs = mapSpecs(def.meta?.slots);
+  const optSpecs = mapSpecs(def.meta?.options);
+
   for (const bag of ['slots', 'options']) {
-    if (body[bag] !== undefined && !isObj(body[bag])) ctx.err(`${label}: "${bag}" must be an object`);
+    if (body[bag] !== undefined && !isObj(body[bag])) {
+      ctx.err(`${label}: "${bag}" must be an object`);
+    }
   }
-  const slots = isObj(body.slots) ? body.slots : {}, options = isObj(body.options) ? body.options : {};
+
+  const slots = isObj(body.slots) ? body.slots : {};
+  const options = isObj(body.options) ? body.options : {};
   const pn = def.meta?.name ?? '?';
 
   for (const k of Object.keys(slots)) {
     if (k in slotSpecs) continue;
-    if (k in optSpecs) ctx.err(`${label}: "${k}" is an option of ${pn}, not a slot — move it into "options"`);
-    else {
+
+    if (k in optSpecs) {
+      ctx.err(`${label}: "${k}" is an option of ${pn}, not a slot — move it into "options"`);
+    } else {
       const h = closest(k, Object.keys(slotSpecs));
-      ctx.err(`${label}: unknown slot "${k}" for ${pn}${h ? ` — did you mean "${h}"?` : ''} (slots: ${Object.keys(slotSpecs).join(', ') || 'none'})`);
+
+      ctx.err(
+        `${label}: unknown slot "${k}" for ${pn}${h ? ` — did you mean "${h}"?` : ''} (slots: ${Object.keys(slotSpecs).join(', ') || 'none'})`
+      );
     }
   }
+
   for (const k of Object.keys(options)) {
     if (k in optSpecs || UNIVERSAL_OPTIONS.includes(k)) continue;
-    if (k in slotSpecs) ctx.err(`${label}: "${k}" is a slot of ${pn}, not an option — move it into "slots"`);
-    else {
+
+    if (k in slotSpecs) {
+      ctx.err(`${label}: "${k}" is a slot of ${pn}, not an option — move it into "slots"`);
+    } else {
       const h = closest(k, Object.keys(optSpecs));
-      ctx.warn(`${label}: ${pn} has no option "${k}"${h ? ` — did you mean "${h}"?` : ''} (it will be ignored)`);
+
+      ctx.warn(
+        `${label}: ${pn} has no option "${k}"${h ? ` — did you mean "${h}"?` : ''} (it will be ignored)`
+      );
     }
   }
 
   let weight = 0;
+
   const visit = (bagName, bag, specs) => {
     for (const [k, v] of Object.entries(bag)) {
       const s = specs[k];
+
       if (!s || hasPh(v)) continue;
+
       const bad = checkValue(s, v);
-      if (bad) { ctx.err(`${label}: ${bagName}.${k}: ${bad}`); continue; }
-      if (s.base === 'string' && typeof v === 'string') weight += v.length;
+
+      if (bad) {
+        ctx.err(`${label}: ${bagName}.${k}: ${bad}`);
+        continue;
+      }
+
+      if (s.base === 'string' && typeof v === 'string') {
+        weight += v.length;
+      }
+
       if (s.base === 'asset' && typeof v === 'string') {
-        const target = typeof ctx.aliases[v] === 'string' ? ctx.aliases[v] : v;
-        if (!ctx.assetExists(target))
-          ctx.err(`${label}: ${bagName}.${k}: asset "${v}" not found${ctx.assetExists.dirs ? ` (looked in ${ctx.assetExists.dirs.join(', ')})` : ''}`);
+        const target =
+          typeof ctx.aliases[v] === 'string'
+            ? ctx.aliases[v]
+            : v;
+
+        if (!ctx.assetExists(target)) {
+          const message =
+            `${label}: ${bagName}.${k}: asset "${v}" not found` +
+            `${ctx.assetExists.dirs
+              ? ` (looked in ${ctx.assetExists.dirs.join(', ')})`
+              : ''}`;
+
+          if (ctx.allowMissingAssets) {
+            ctx.missingAssets.push(message);
+            ctx.warn(`${message} — draft placeholder expected`);
+          } else {
+            ctx.err(message);
+          }
+        }
       }
     }
   };
+
   visit('slots', slots, slotSpecs);
   visit('options', options, optSpecs);
-  for (const [k, s] of Object.entries(slotSpecs))
-    if (isRequired(s) && (slots[k] === undefined || slots[k] === null)) ctx.err(`${label}: missing required slot "${k}" (${s.type})`);
+
+  for (const [k, s] of Object.entries(slotSpecs)) {
+    if (isRequired(s) && (slots[k] === undefined || slots[k] === null)) {
+      ctx.err(`${label}: missing required slot "${k}" (${s.type})`);
+    }
+  }
+
   return weight;
 }
 
 const len = (v, base) => {
   if (typeof v === 'number') return v;
-  const m = typeof v === 'string' ? /^(-?\d+(?:\.\d+)?)(%|px)?$/.exec(v.trim()) : null;
-  return m ? (m[2] === '%' ? (parseFloat(m[1]) * base) / 100 : parseFloat(m[1])) : NaN;
+
+  const m = typeof v === 'string'
+    ? /^(-?\d+(?:\.\d+)?)(%|px)?$/.exec(v.trim())
+    : null;
+
+  return m
+    ? (m[2] === '%' ? (parseFloat(m[1]) * base) / 100 : parseFloat(m[1]))
+    : NaN;
 };
 
 function lintSafeArea(layer, label, ctx) {
   const o = isObj(layer.options) ? layer.options : {};
   const { W, H, safe } = ctx.fmt;
-  const x = len(o.x, W), y = len(o.y, H);
+
+  const x = len(o.x, W);
+  const y = len(o.y, H);
+
   if (Number.isNaN(x) || Number.isNaN(y)) return;
-  const w = len(o.w, W), h = len(o.h, H);
-  const hw = Number.isNaN(w) ? 0 : w / 2, hh = Number.isNaN(h) ? 0 : h / 2;
-  if (x - hw < safe.left - 1 || x + hw > W - safe.right + 1 || y - hh < safe.top - 1 || y + hh > H - safe.bottom + 1)
-    ctx.warn(`${label}: text layer extends outside the safe area (before camera movement). Safe box: x ${safe.left}–${W - safe.right}, y ${safe.top}–${H - safe.bottom}; the bottom band is for captions.`);
+
+  const w = len(o.w, W);
+  const h = len(o.h, H);
+
+  const hw = Number.isNaN(w) ? 0 : w / 2;
+  const hh = Number.isNaN(h) ? 0 : h / 2;
+
+  if (
+    x - hw < safe.left - 1 ||
+    x + hw > W - safe.right + 1 ||
+    y - hh < safe.top - 1 ||
+    y + hh > H - safe.bottom + 1
+  ) {
+    ctx.warn(
+      `${label}: text layer extends outside the safe area (before camera movement). Safe box: x ${safe.left}–${W - safe.right}, y ${safe.top}–${H - safe.bottom}; the bottom band is for captions.`
+    );
+  }
 }
 
 /** Validates one layer. Returns { weight } or null. Exported for recipes. */
 export function checkLayer(layer, label, ctx) {
-  if (!isObj(layer)) { ctx.err(`${label}: layer must be an object`); return null; }
+  if (!isObj(layer)) {
+    ctx.err(`${label}: layer must be an object`);
+    return null;
+  }
+
   for (const k of Object.keys(layer)) {
     if (LAYER_KEYS.includes(k)) continue;
-    const h = closest(k, LAYER_KEYS);
-    ctx.err(`${label}: unknown layer key "${k}"${h ? ` — did you mean "${h}"?` : ''} (slot/option values go inside "slots"/"options"; allowed: ${LAYER_KEYS.join(', ')})`);
-  }
-  for (const f of ['at', 'until']) if (layer[f] !== undefined) checkCue(layer[f], label, f, ctx);
-  if (layer.depth !== undefined && !hasPh(layer.depth) && !(typeof layer.depth === 'number' && layer.depth >= 0 && layer.depth <= 1))
-    ctx.err(`${label}: depth must be a number from 0 (far) to 1 (near)`);
-  if (layer.z !== undefined && !hasPh(layer.z) && typeof layer.z !== 'number') ctx.err(`${label}: z must be a number`);
-  if (layer.space !== undefined && !hasPh(layer.space) && !['world', 'screen'].includes(layer.space))
-    ctx.err(`${label}: space must be "world" or "screen"`);
 
-  if (typeof layer.prop !== 'string' || !layer.prop) { ctx.err(`${label}: "prop" is required`); return null; }
+    const h = closest(k, LAYER_KEYS);
+
+    ctx.err(
+      `${label}: unknown layer key "${k}"${h ? ` — did you mean "${h}"?` : ''} (slot/option values go inside "slots"/"options"; allowed: ${LAYER_KEYS.join(', ')})`
+    );
+  }
+
+  for (const f of ['at', 'until']) {
+    if (layer[f] !== undefined) checkCue(layer[f], label, f, ctx);
+  }
+
+  if (
+    layer.depth !== undefined &&
+    !hasPh(layer.depth) &&
+    !(typeof layer.depth === 'number' && layer.depth >= 0 && layer.depth <= 1)
+  ) {
+    ctx.err(`${label}: depth must be a number from 0 (far) to 1 (near)`);
+  }
+
+  if (layer.z !== undefined && !hasPh(layer.z) && typeof layer.z !== 'number') {
+    ctx.err(`${label}: z must be a number`);
+  }
+
+  if (
+    layer.space !== undefined &&
+    !hasPh(layer.space) &&
+    !['world', 'screen'].includes(layer.space)
+  ) {
+    ctx.err(`${label}: space must be "world" or "screen"`);
+  }
+
+  if (typeof layer.prop !== 'string' || !layer.prop) {
+    ctx.err(`${label}: "prop" is required`);
+    return null;
+  }
+
   const def = resolveProp(layer.prop, `${label} (${layer.prop})`, ctx);
   if (!def) return null;
+
   const weight = checkBody(layer, def, `${label} (${layer.prop})`, ctx);
+
   if (weight > 0) lintSafeArea(layer, `${label} (${layer.prop})`, ctx);
+
   return { weight };
 }
 
 /** Validate a recipe's shot snippet (placeholders allowed). */
 export function validateRecipe(recipe, props) {
   const ctx = makeCtx({ props });
-  (recipe.shot?.layers ?? []).forEach((l, i) => checkLayer(l, `layers[${i}]`, ctx));
-  return { errors: ctx.errors, missing: [...ctx.missing.keys()] };
+
+  (recipe.shot?.layers ?? []).forEach((l, i) => {
+    checkLayer(l, `layers[${i}]`, ctx);
+  });
+
+  return {
+    errors: ctx.errors,
+    missing: [...ctx.missing.keys()],
+  };
 }
 
 /** Problems with a prop's own meta (and its example). [] when healthy. */
 export function checkPropMeta(def) {
-  const m = def?.meta, p = [];
+  const m = def?.meta;
+  const p = [];
+
   if (!m) return ['missing meta'];
-  for (const k of ['name', 'use', 'avoid']) if (typeof m[k] !== 'string' || !m[k].trim()) p.push(`meta.${k} must be a non-empty string`);
-  for (const k of ['slots', 'options']) if (!isObj(m[k])) p.push(`meta.${k} must be an object`);
+
+  for (const k of ['name', 'use', 'avoid']) {
+    if (typeof m[k] !== 'string' || !m[k].trim()) {
+      p.push(`meta.${k} must be a non-empty string`);
+    }
+  }
+
+  for (const k of ['slots', 'options']) {
+    if (!isObj(m[k])) p.push(`meta.${k} must be an object`);
+  }
+
   if (!(m.defaultDuration > 0)) p.push('meta.defaultDuration must be > 0');
   if (!isObj(m.example)) p.push('meta.example must be { slots, options }');
   if (typeof def.draw !== 'function') p.push('draw must be a function');
+
   if (p.length) return p;
-  const slots = mapSpecs(m.slots), opts = mapSpecs(m.options);
-  for (const k of Object.keys(slots)) if (k in opts) p.push(`"${k}" is both a slot and an option`);
-  for (const [k, s] of [...Object.entries(slots), ...Object.entries(opts)]) if (s.base === 'unknown') p.push(`"${k}" has unknown type "${s.type}"`);
+
+  const slots = mapSpecs(m.slots);
+  const opts = mapSpecs(m.options);
+
+  for (const k of Object.keys(slots)) {
+    if (k in opts) p.push(`"${k}" is both a slot and an option`);
+  }
+
+  for (const [k, s] of [...Object.entries(slots), ...Object.entries(opts)]) {
+    if (s.base === 'unknown') p.push(`"${k}" has unknown type "${s.type}"`);
+  }
+
   const ctx = makeCtx({ props: { [m.name]: def } });
-  checkLayer({ prop: m.name, slots: m.example.slots ?? {}, options: m.example.options ?? {} }, 'meta.example', ctx);
+
+  checkLayer(
+    {
+      prop: m.name,
+      slots: m.example.slots ?? {},
+      options: m.example.options ?? {},
+    },
+    'meta.example',
+    ctx
+  );
+
   return [...p, ...ctx.errors];
 }
 
-export function validateScript({ script, props, aspect = '9:16', assetExists = () => true }) {
-  const ctx = makeCtx({ props, aspect, assetExists, aliases: isObj(script?.assets) ? script.assets : {} });
-  const done = () => ({ errors: ctx.errors, warnings: ctx.warnings, info: ctx.info,
-    missingProps: [...ctx.missing].map(([name, uses]) => ({ name, uses })) });
-  if (!isObj(script)) { ctx.err('script.json must be a JSON object'); return done(); }
-  const ph = JSON.stringify(script).match(/\{\{[^}]+\}\}/g);
-  if (ph) ctx.err(`unfilled placeholder(s): ${[...new Set(ph)].slice(0, 5).join(', ')}`);
+export function validateScript({
+  script,
+  props,
+  aspect = '9:16',
+  assetExists = () => true,
+  allowMissingAssets = false,
+}) {
+  const ctx = makeCtx({
+    props,
+    aspect,
+    assetExists,
+    aliases: isObj(script?.assets) ? script.assets : {},
+    allowMissingAssets,
+  });
 
-  if (!Array.isArray(script.lines) || !script.lines.length) ctx.err('"lines" must be a non-empty array');
+  const done = () => ({
+    errors: ctx.errors,
+    warnings: ctx.warnings,
+    info: ctx.info,
+    missingProps: [...ctx.missing].map(([name, uses]) => ({ name, uses })),
+    missingAssets: ctx.missingAssets,
+  });
+
+  if (!isObj(script)) {
+    ctx.err('script.json must be a JSON object');
+    return done();
+  }
+
+  const ph = JSON.stringify(script).match(/\{\{[^}]+\}\}/g);
+
+  if (ph) {
+    ctx.err(`unfilled placeholder(s): ${[...new Set(ph)].slice(0, 5).join(', ')}`);
+  }
+
+  if (!Array.isArray(script.lines) || !script.lines.length) {
+    ctx.err('"lines" must be a non-empty array');
+  }
+
   const ids = new Set();
+
   (Array.isArray(script.lines) ? script.lines : []).forEach((ln, i) => {
     const L = `lines[${i}]`;
+
     if (!isObj(ln)) return ctx.err(`${L}: must be an object`);
-    if (typeof ln.id !== 'string' || !ln.id) ctx.err(`${L}: "id" is required`);
-    else if (ids.has(ln.id)) ctx.err(`${L}: duplicate line id "${ln.id}"`);
-    else ids.add(ln.id);
-    if (typeof ln.text !== 'string' || !ln.text.trim()) ctx.err(`${L}: "text" must be a non-empty string`);
-    if (ln.say !== undefined && typeof ln.say !== 'string') ctx.err(`${L}: "say" must be a string`);
-    if (ln.caps !== undefined && ln.caps !== false && typeof ln.caps !== 'string') ctx.err(`${L}: "caps" must be a string or false`);
+
+    if (typeof ln.id !== 'string' || !ln.id) {
+      ctx.err(`${L}: "id" is required`);
+    } else if (ids.has(ln.id)) {
+      ctx.err(`${L}: duplicate line id "${ln.id}"`);
+    } else {
+      ids.add(ln.id);
+    }
+
+    if (typeof ln.text !== 'string' || !ln.text.trim()) {
+      ctx.err(`${L}: "text" must be a non-empty string`);
+    }
+
+    if (ln.say !== undefined && typeof ln.say !== 'string') {
+      ctx.err(`${L}: "say" must be a string`);
+    }
+
+    if (ln.caps !== undefined && ln.caps !== false && typeof ln.caps !== 'string') {
+      ctx.err(`${L}: "caps" must be a string or false`);
+    }
+
     if (typeof ln.caps === 'string') {
-      if ((ln.caps.match(/\*/g) || []).length % 2) ctx.err(`${L}: caps has an unbalanced "*"`);
+      if ((ln.caps.match(/\*/g) || []).length % 2) {
+        ctx.err(`${L}: caps has an unbalanced "*"`);
+      }
+
       for (const c of ln.caps.split('|')) {
         const n = c.replace(/\*/g, '').trim().split(/\s+/).filter(Boolean).length;
-        if (n > 8) ctx.warn(`${L}: caption chunk "${c.trim().slice(0, 30)}…" has ${n} words; split with "|" (aim for ≤ 6)`);
+
+        if (n > 8) {
+          ctx.warn(`${L}: caption chunk "${c.trim().slice(0, 30)}…" has ${n} words; split with "|" (aim for ≤ 6)`);
+        }
       }
     }
   });
 
-  if (!Array.isArray(script.shots) || !script.shots.length) ctx.err('"shots" must be a non-empty array');
+  if (!Array.isArray(script.shots) || !script.shots.length) {
+    ctx.err('"shots" must be a non-empty array');
+  }
+
   (Array.isArray(script.shots) ? script.shots : []).forEach((s, i) => {
     const L = `shots[${i}]`;
+
     if (!isObj(s)) return ctx.err(`${L}: must be an object`);
+
     if (s.span !== undefined) {
-      if (!Array.isArray(s.span) || s.span.length !== 2) ctx.err(`${L}: span must be [fromCue, toCue]`);
-      else s.span.forEach((c, j) => checkCue(c, L, `span[${j}]`, ctx));
+      if (!Array.isArray(s.span) || s.span.length !== 2) {
+        ctx.err(`${L}: span must be [fromCue, toCue]`);
+      } else {
+        s.span.forEach((c, j) => checkCue(c, L, `span[${j}]`, ctx));
+      }
     }
+
     if (s.camera !== undefined) {
-      const mv = typeof s.camera === 'string' ? s.camera : isObj(s.camera) ? s.camera.move ?? s.camera.type : null;
-      if (mv === null) ctx.err(`${L}: camera must be a move name or an object`);
-      else if (mv !== undefined && !hasPh(mv) && !CAMERA_MOVES.includes(mv))
+      const mv = typeof s.camera === 'string'
+        ? s.camera
+        : isObj(s.camera)
+          ? s.camera.move ?? s.camera.type
+          : null;
+
+      if (mv === null) {
+        ctx.err(`${L}: camera must be a move name or an object`);
+      } else if (mv !== undefined && !hasPh(mv) && !CAMERA_MOVES.includes(mv)) {
         ctx.err(`${L}: unknown camera move "${mv}" (${CAMERA_MOVES.join(', ')})`);
+      }
     }
-    if (s.layers !== undefined && !Array.isArray(s.layers)) ctx.err(`${L}: "layers" must be an array`);
+
+    if (s.layers !== undefined && !Array.isArray(s.layers)) {
+      ctx.err(`${L}: "layers" must be an array`);
+    }
+
     let heavy = 0;
+
     (Array.isArray(s.layers) ? s.layers : []).forEach((l, j) => {
       const r = checkLayer(l, `${L}.layers[${j}]`, ctx);
       if (r && r.weight >= TEXT_HEAVY) heavy++;
     });
-    if (heavy > 2) ctx.warn(`${L}: ${heavy} text-heavy layers (max 2 at once) — give them "until" so they don't overlap`);
+
+    if (heavy > 2) {
+      ctx.warn(`${L}: ${heavy} text-heavy layers (max 2 at once) — give them "until" so they don't overlap`);
+    }
+
     if (s.transition !== undefined) {
-      const t = s.transition, TL = `${L}.transition`;
-      if (!isObj(t) || typeof t.type !== 'string') ctx.err(`${TL}: needs { "type": "<transition prop>" }`);
-      else {
-        if (t.duration !== undefined && !(typeof t.duration === 'number' && t.duration > 0)) ctx.err(`${TL}: duration must be a number > 0`);
+      const t = s.transition;
+      const TL = `${L}.transition`;
+
+      if (!isObj(t) || typeof t.type !== 'string') {
+        ctx.err(`${TL}: needs { "type": "<transition prop>" }`);
+      } else {
+        if (t.duration !== undefined && !(typeof t.duration === 'number' && t.duration > 0)) {
+          ctx.err(`${TL}: duration must be a number > 0`);
+        }
+
         const def = resolveProp(t.type, `${TL} (${t.type})`, ctx);
+
         if (def) {
-          if (def.meta?.category && def.meta.category !== 'transitions') ctx.warn(`${TL}: "${t.type}" is not in the transitions category`);
+          if (def.meta?.category && def.meta.category !== 'transitions') {
+            ctx.warn(`${TL}: "${t.type}" is not in the transitions category`);
+          }
+
           checkBody(t, def, `${TL} (${t.type})`, ctx);
         }
       }
     }
   });
+
   return done();
 }
 
 /** Events = shot starts + layer starts. Returns null if the timeline shape isn't recognised. */
 export function timelineEvents(tl) {
-  const pick = (o, ...ks) => { for (const k of ks) if (typeof o?.[k] === 'number') return o[k]; };
+  const pick = (o, ...ks) => {
+    for (const k of ks) {
+      if (typeof o?.[k] === 'number') return o[k];
+    }
+  };
+
   if (!Array.isArray(tl?.shots) || !tl.shots.length) return null;
+
   const ev = [];
-  let sawLayers = false, sawTimes = false;
+  let sawLayers = false;
+  let sawTimes = false;
+
   for (const s of tl.shots) {
     const a = pick(s, 'start', 't0', 'from');
     if (a === undefined) return null;
+
     ev.push(a);
+
     for (const l of s.layers ?? []) {
       sawLayers = true;
+
       const t = pick(l, 'start', 't0', 'from');
-      if (t !== undefined) { sawTimes = true; ev.push(t); }
+
+      if (t !== undefined) {
+        sawTimes = true;
+        ev.push(t);
+      }
     }
   }
+
   if (sawLayers && !sawTimes) return null;
-  const end = pick(tl, 'end', 'duration', 'total') ?? pick(tl.shots.at(-1), 'end', 't1', 'to');
-  return { events: [...new Set(ev)].sort((a, b) => a - b), end };
+
+  const end =
+    pick(tl, 'end', 'duration', 'total') ??
+    pick(tl.shots.at(-1), 'end', 't1', 'to');
+
+  return {
+    events: [...new Set(ev)].sort((a, b) => a - b),
+    end,
+  };
 }
 
 export function lintTimeline(tl) {
   const r = timelineEvents(tl);
-  if (!r) return { warnings: [], note: 'pacing lint skipped (timeline shape not recognised)' };
+
+  if (!r) {
+    return {
+      warnings: [],
+      note: 'pacing lint skipped (timeline shape not recognised)',
+    };
+  }
+
   const warnings = [];
   const pts = r.end === undefined ? r.events : [...r.events, r.end];
-  for (let i = 1; i < pts.length; i++)
-    if (pts[i] - pts[i - 1] > MAX_QUIET)
-      warnings.push(`no new visual or cue for ${(pts[i] - pts[i - 1]).toFixed(1)}s (${pts[i - 1].toFixed(1)}s → ${pts[i].toFixed(1)}s)`);
+
+  for (let i = 1; i < pts.length; i++) {
+    if (pts[i] - pts[i - 1] > MAX_QUIET) {
+      warnings.push(
+        `no new visual or cue for ${(pts[i] - pts[i - 1]).toFixed(1)}s (${pts[i - 1].toFixed(1)}s → ${pts[i].toFixed(1)}s)`
+      );
+    }
+  }
+
   return { warnings, note: null };
 }
 
 async function dryRun({ root, project, aspect, defs }) {
-  const { loadProject } = await import(pathToFileURL(path.join(root, 'core/project.js')).href);
+  const { loadProject } = await import(
+    pathToFileURL(path.join(root, 'core/project.js')).href
+  );
+
   const projectDir = path.join(root, 'projects', project);
   let props = defs;
-  for (const f of [path.join(projectDir, 'registry.generated.js'), path.join(root, 'props/registry.generated.js')]) {
+
+  for (const f of [
+    path.join(projectDir, 'registry.generated.js'),
+    path.join(root, 'props/registry.generated.js'),
+  ]) {
     if (!fs.existsSync(f)) continue;
+
     try {
       const m = await import(pathToFileURL(f).href + `?t=${Date.now()}`);
       const r = m.default ?? m.props ?? m.registry ?? m;
-      props = Array.isArray(r) ? r : Object.fromEntries(Object.entries(r).map(([k, v]) => [k, v?.default?.meta ? v.default : v]));
+
+      props = Array.isArray(r)
+        ? r
+        : Object.fromEntries(
+            Object.entries(r).map(([k, v]) => [
+              k,
+              v?.default?.meta ? v.default : v,
+            ])
+          );
+
       break;
-    } catch { /* fall back to discovered defs */ }
+    } catch {
+      // Fall back to discovered defs.
+    }
   }
-  const find = (p) => [path.isAbsolute(p) ? p : null, path.join(projectDir, p), path.join(root, p), path.join(projectDir, 'assets', p)]
-    .filter(Boolean).find((c) => fs.existsSync(c) && fs.statSync(c).isFile());
-  const noFile = (p) => Object.assign(new Error(`ENOENT: ${p}`), { code: 'ENOENT' });
+
+  const find = (p) =>
+    [
+      path.isAbsolute(p) ? p : null,
+      path.join(projectDir, p),
+      path.join(root, p),
+      path.join(projectDir, 'assets', p),
+    ]
+      .filter(Boolean)
+      .find((c) => fs.existsSync(c) && fs.statSync(c).isFile());
+
+  const noFile = (p) =>
+    Object.assign(new Error(`ENOENT: ${p}`), { code: 'ENOENT' });
+
   return loadProject({
-    readJSON: async (p) => { const f = find(p); if (!f) throw noFile(p); return JSON.parse(fs.readFileSync(f, 'utf8')); },
-    loadImage: async (p) => { if (!find(p)) throw noFile(p); return { width: 100, height: 100 }; },
-    createCanvas: (w, h) => ({ width: w, height: h, getContext: () => null }),
+    readJSON: async (p) => {
+      const f = find(p);
+      if (!f) throw noFile(p);
+      return JSON.parse(fs.readFileSync(f, 'utf8'));
+    },
+    loadImage: async (p) => {
+      if (!find(p)) throw noFile(p);
+      return { width: 100, height: 100 };
+    },
+    createCanvas: (w, h) => ({
+      width: w,
+      height: h,
+      getContext: () => null,
+    }),
     resolvePath: (p) => find(p) ?? p,
-    props, aspect, strict: true,
+    props,
+    aspect,
+    strict: true,
   });
 }
 
-export async function validateProject({ project, aspect = '9:16', dry = true, root = ROOT }) {
+export async function validateProject({
+  project,
+  aspect = '9:16',
+  dry = true,
+  root = ROOT,
+  draft = false,
+}) {
   let scanNote = null;
-  try { execFileSync(process.execPath, [path.join(root, 'tools/scan-props.mjs')], { cwd: root, stdio: 'pipe' }); }
-  catch (e) { scanNote = `prop scan failed: ${String(e.stderr || e.message).split('\n')[0]}`; }
+
+  try {
+    execFileSync(
+      process.execPath,
+      [path.join(root, 'tools/scan-props.mjs')],
+      { cwd: root, stdio: 'pipe' }
+    );
+  } catch (e) {
+    scanNote = `prop scan failed: ${String(e.stderr || e.message).split('\n')[0]}`;
+  }
+
   const { props, problems } = await discoverProps({ root, project });
   const defs = toDefs(props);
+
   const projectDir = path.join(root, 'projects', project);
   const file = path.join(projectDir, 'script.json');
-  const empty = { errors: [], warnings: [], info: [], missingProps: [] };
-  if (!fs.existsSync(file)) return { ...empty, errors: [`projects/${project}/script.json not found`] };
-  let script;
-  try { script = JSON.parse(fs.readFileSync(file, 'utf8')); }
-  catch (e) { return { ...empty, errors: [`script.json is not valid JSON: ${e.message}`] }; }
 
-  const res = validateScript({ script, props: defs, aspect, assetExists: makeAssetExists(root, projectDir) });
-  res.warnings.unshift(...problems.map((p) => `prop registry: ${p}`), ...(scanNote ? [scanNote] : []));
+  const empty = {
+    errors: [],
+    warnings: [],
+    info: [],
+    missingProps: [],
+    missingAssets: [],
+  };
+
+  if (!fs.existsSync(file)) {
+    return {
+      ...empty,
+      errors: [`projects/${project}/script.json not found`],
+    };
+  }
+
+  let script;
+
+  try {
+    script = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (e) {
+    return {
+      ...empty,
+      errors: [`script.json is not valid JSON: ${e.message}`],
+    };
+  }
+
+  const res = validateScript({
+    script,
+    props: defs,
+    aspect,
+    assetExists: makeAssetExists(root, projectDir),
+    allowMissingAssets: draft,
+  });
+
+  res.warnings.unshift(
+    ...problems.map((p) => `prop registry: ${p}`),
+    ...(scanNote ? [scanNote] : [])
+  );
+
   if (!dry) return res;
+
   if (res.errors.length || res.missingProps.length) {
     res.info.push('director dry-run skipped (fix the items above first)');
     return res;
   }
+
+  // In draft mode, missing images are allowed through validation.
+  // Skip the strict director dry-run only when those images are missing.
+  // The actual renderer handles the existing draft placeholders.
+  if (draft && res.missingAssets.length) {
+    res.info.push(
+      `director dry-run skipped in draft mode (${res.missingAssets.length} missing asset(s))`
+    );
+    return res;
+  }
+
   try {
     const r = await dryRun({ root, project, aspect, defs });
-    if (r.estimated) res.info.push('timing is estimated (no words.json yet); word cues resolve against the script text');
+
+    if (r.estimated) {
+      res.info.push(
+        'timing is estimated (no words.json yet); word cues resolve against the script text'
+      );
+    }
+
     const lint = lintTimeline(r.timeline);
+
     res.warnings.push(...lint.warnings);
+
     if (lint.note) res.info.push(lint.note);
   } catch (e) {
-    res.errors.push(`director dry-run failed: ${e.message} (if this looks like a harness problem rather than your script, report it)`);
+    res.errors.push(
+      `director dry-run failed: ${e.message} (if this looks like a harness problem rather than your script, report it)`
+    );
   }
+
   return res;
 }
 
 function print(project, aspect, res) {
   const out = [`validate ${project} (${aspect})`];
-  const sect = (icon, title, items) => items.length && out.push(`\n${icon} ${items.length} ${title}`, ...items.map((m) => `  - ${m}`));
+
+  const sect = (icon, title, items) => {
+    if (items.length) {
+      out.push(
+        `\n${icon} ${items.length} ${title}`,
+        ...items.map((m) => `  - ${m}`)
+      );
+    }
+  };
+
   sect('✖', 'error(s)', res.errors);
+
   if (res.missingProps.length) {
     out.push('\nMISSING PROPS (ask for these to be built, or pick another prop)');
-    for (const m of res.missingProps) out.push(`  - ${m.name}: used ${m.uses.length}x at ${m.uses.join('; ')}`);
+
+    for (const m of res.missingProps) {
+      out.push(
+        `  - ${m.name}: used ${m.uses.length}x at ${m.uses.join('; ')}`
+      );
+    }
   }
+
   sect('⚠', 'warning(s)', res.warnings);
-  if (res.info.length) out.push('', ...res.info.map((m) => `ℹ ${m}`));
-  if (!res.errors.length && !res.missingProps.length) out.push('\n✔ script is valid');
+
+  if (res.info.length) {
+    out.push('', ...res.info.map((m) => `ℹ ${m}`));
+  }
+
+  if (!res.errors.length && !res.missingProps.length) {
+    out.push('\n✔ script is valid');
+  }
+
   console.log(out.join('\n'));
 }
 
 async function main() {
   const args = process.argv.slice(2);
+
   const ai = args.indexOf('--aspect');
   const aspect = ai >= 0 ? args[ai + 1] : '9:16';
-  const project = args.find((a, i) => !a.startsWith('--') && i !== ai + 1);
-  if (!project) { console.error('usage: npm run validate -- <project> [--aspect 9:16|16:9] [--json] [--no-dry-run]'); process.exit(2); }
-  const res = await validateProject({ project, aspect, dry: !args.includes('--no-dry-run') });
-  if (args.includes('--json')) console.log(JSON.stringify(res, null, 2));
-  else print(project, aspect, res);
+
+  const project = args.find((a) => !a.startsWith('--'));
+  const draft = args.includes('--draft');
+
+  if (!project) {
+    console.error(
+      'usage: npm run validate -- <project> [--aspect 9:16|16:9] [--json] [--no-dry-run] [--draft]'
+    );
+    process.exit(2);
+  }
+
+  const res = await validateProject({
+    project,
+    aspect,
+    dry: !args.includes('--no-dry-run'),
+    draft,
+  });
+
+  if (args.includes('--json')) {
+    console.log(JSON.stringify(res, null, 2));
+  } else {
+    print(project, aspect, res);
+  }
+
   process.exit(res.errors.length || res.missingProps.length ? 1 : 0);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main();
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
+  main();
+}
