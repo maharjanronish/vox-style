@@ -1,0 +1,159 @@
+{
+  "meta": {
+    "title": "Paper Photo Demo",
+    "aspect": "16:9",
+    "fps": 60,
+    "theme": "default"
+  },
+  "assets": {
+    "skyline": "assets/sample/skyline.png"
+  },
+  "lines": [
+    {
+      "id": "l1",
+      "text": "This whole video is drawn in code, with paper, ink and a marker."
+    },
+    {
+      "id": "l2",
+      "text": "A photo gets taped down, and a circle shows where to look."
+    },
+    {
+      "id": "l3",
+      "text": "Then a name slides in at the bottom, right on cue, just like a news show."
+    },
+    {
+      "id": "l4",
+      "text": "That is the whole kit, so far."
+    }
+  ],
+  "shots": [
+    {
+      "line": "l1",
+      "camera": "push-in",
+      "layers": [
+        {
+          "prop": "paperBg",
+          "options": {
+            "variant": "grid"
+          },
+          "at": "start"
+        },
+        {
+          "prop": "paperPhoto",
+          "slots": {
+            "src": "skyline"
+          },
+          "options": {
+            "look": "bw",
+            "y": 800
+          },
+          "at": "start"
+        }
+      ]
+    },
+    {
+      "line": "l2",
+      "camera": "push-in",
+      "layers": [
+        {
+          "prop": "paperBg",
+          "options": {
+            "variant": "lined"
+          },
+          "at": "start"
+        },
+        {
+          "prop": "paperPhoto",
+          "slots": {
+            "src": "skyline",
+            "caption": "Sample skyline"
+          },
+          "options": {
+            "look": "color",
+            "y": 800
+          },
+          "at": "start"
+        },
+        {
+          "prop": "markerCircle",
+          "options": {
+            "x": 720,
+            "y": 900,
+            "w": 280,
+            "h": 200,
+            "shape": "circle"
+          },
+          "at": "word:circle"
+        }
+      ]
+    },
+    {
+      "line": "l3",
+      "camera": "drift",
+      "layers": [
+        {
+          "prop": "paperBg",
+          "options": {
+            "variant": "kraft"
+          },
+          "at": "start"
+        },
+        {
+          "prop": "paperPhoto",
+          "slots": {
+            "src": "skyline"
+          },
+          "options": {
+            "look": "duotone",
+            "y": 760
+          },
+          "at": "start"
+        },
+        {
+          "prop": "lowerThird",
+          "slots": {
+            "name": "Jane Example",
+            "title": "Narrator, sample footage"
+          },
+          "at": "word:name"
+        }
+      ]
+    },
+    {
+      "line": "l4",
+      "camera": "push-in",
+      "layers": [
+        {
+          "prop": "paperBg",
+          "options": {
+            "variant": "dots"
+          },
+          "at": "start"
+        },
+        {
+          "prop": "paperPhoto",
+          "slots": {
+            "src": "skyline"
+          },
+          "options": {
+            "look": "warm",
+            "y": 800,
+            "rot": -3
+          },
+          "at": "start"
+        },
+        {
+          "prop": "markerCircle",
+          "options": {
+            "x": 540,
+            "y": 1090,
+            "w": 520,
+            "h": 60,
+            "shape": "underline"
+          },
+          "at": "start+0.6s"
+        }
+      ]
+    }
+  ]
+}

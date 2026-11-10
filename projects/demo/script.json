@@ -1,0 +1,17 @@
+{
+  "meta": { "title": "Phase 1B smoke test", "aspect": "9:16", "fps": 30, "theme": "default" },
+  "assets": {},
+  "lines": [
+    { "id": "l1", "text": "In 1997, Hong Kong changed hands.",
+      "say": "In nineteen ninety-seven, Hong Kong changed hands.",
+      "caps": "In *1997*|Hong Kong changed hands." },
+    { "id": "l2", "text": "It was the end of a very long era.",
+      "caps": "It was the *end*|of a very long era." }
+  ],
+  "shots": [
+    { "line": "l1", "camera": { "move": "push-in", "amount": 1.12 },
+      "layers": [ { "prop": "solidBg", "options": { "grid": true }, "depth": 0.1 } ] },
+    { "line": "l2", "camera": { "move": "pan-left", "amount": 0.08 },
+      "layers": [ { "prop": "solidBg", "options": { "color": "kraft", "grid": true } } ] }
+  ]
+}

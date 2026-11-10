@@ -1,0 +1,8 @@
+node_modules/
+vendor/
+models/
+out/
+*.log
+*.generated.js
+.build/
+bench-out/

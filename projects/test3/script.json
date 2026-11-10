@@ -1,0 +1,37 @@
+{
+  "lines": [
+    { "id": "l1", "text": "In 1997, a newspaper announced the handover.", "say": "In nineteen ninety-seven, a newspaper announced the handover." },
+    { "id": "l2", "text": "It ended 156 years of British rule.", "say": "It ended one hundred fifty-six years of British rule." },
+    { "id": "l3", "text": "The photo shows the harbour, and the stamp says it all." },
+    { "id": "l4", "text": "The population kept growing, as this chart shows." },
+    { "id": "l5", "text": "All of it on the south coast of China." }
+  ],
+  "shots": [
+    { "line": "l1", "camera": "push-in", "layers": [
+      { "prop": "paperBg", "options": { "variant": "grid" }, "at": "start" },
+      { "prop": "newspaperClip", "slots": { "headline": "HONG KONG RETURNS TO CHINA", "body": "After 156 years of British rule, the territory was handed over at midnight.", "source": "Morning Post · 1 July 1997" }, "options": { "mark": "RETURNS" }, "at": "start" }
+    ] },
+    { "line": "l2", "camera": "push-in", "transition": { "type": "paperSlide" }, "layers": [
+      { "prop": "paperBg", "options": { "variant": "dots" }, "at": "start" },
+      { "prop": "bigNumber", "slots": { "value": "156", "label": "years of British rule" }, "at": "start" }
+    ] },
+    { "line": "l3", "camera": "drift", "layers": [
+      { "prop": "paperBg", "options": { "variant": "kraft" }, "at": "start" },
+      { "prop": "paperPhoto", "slots": { "src": "assets/sample/skyline.png", "caption": "Victoria Harbour (sample)" }, "options": { "y": 800 }, "at": "start" },
+      { "prop": "highlighter", "options": { "x": 540, "y": 1010, "w": 560, "h": 60 }, "at": "word:harbour" },
+      { "prop": "stamp", "slots": { "text": "HANDOVER" }, "options": { "rot": -10 }, "at": "word:stamp" }
+    ] },
+    { "line": "l4", "camera": "push-in", "transition": { "type": "wipe", "duration": 0.6, "options": { "direction": "left" } }, "layers": [
+      { "prop": "paperBg", "options": { "variant": "grid" }, "at": "start" },
+      { "prop": "barChart", "slots": { "title": "HONG KONG POPULATION", "data": [
+        { "label": "1980", "value": 5.1 }, { "label": "1990", "value": 5.7 }, { "label": "1997", "value": 6.5 }, { "label": "2010", "value": 7 } ] },
+        "options": { "unit": "M", "highlight": 2 }, "at": "start" }
+    ] },
+    { "line": "l5", "camera": "push-in", "layers": [
+      { "prop": "paperBg", "options": { "variant": "plain" }, "at": "start" },
+      { "prop": "baseMap", "slots": { "focus": ["Hong Kong"], "pins": [
+        { "lon": 114.17, "lat": 22.32, "label": "Hong Kong" }, { "lon": 113.26, "lat": 23.13, "label": "Guangzhou", "side": "left" } ] },
+        "options": { "bbox": [111.5, 21, 116.5, 24.8] }, "at": "start" }
+    ] }
+  ]
+}
