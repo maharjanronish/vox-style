@@ -41,7 +41,7 @@ export default {
     ctx.save();
     place(ctx, { ...o, x: num(o.x, W / 2), y: num(o.y, (m.top + H - m.bottom) / 2), rot: num(o.rot, -1), scale: num(o.scale, 1) * (0.96 + 0.04 * s) }, env);
     ctx.translate(0, (1 - s) * 70);
-    ctx.globalAlpha *= vis * num(o.opacity, 1);
+    ctx.globalAlpha *= vis;
     if (o.card !== false) dropShadow(ctx, theme, () => { ctx.fillStyle = paint(theme, 'white'); rrect(ctx, -cw / 2, -ch / 2, cw, ch, 8); ctx.fill(); }, {});
 
     let top = -ch / 2 + pad;

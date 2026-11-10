@@ -56,9 +56,10 @@ function walk(d, out = []) {
 
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
     if (
-      /^(node_modules|\.git|build|dist)$/.test(e.name) ||
+      /^(node_modules|\.git|build|dist|qa)$/.test(e.name) ||
       /^out(\.draft)?\.mp4$/.test(e.name) ||
-      e.name === 'narration.txt'
+      e.name === 'narration.txt' ||
+      e.name === 'registry.generated.js'
     ) {
       continue;
     }

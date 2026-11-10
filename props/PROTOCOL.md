@@ -1,7 +1,7 @@
 # Prop protocol (read this before writing a prop)
 
 A prop = folder `props/<category>/<name>/index.js` (kit) or `projects/<p>/props/<name>/index.js` (one-off).
-Folder name MUST equal meta.name. Copy `props/_template`, or run `npm run new-prop` (Phase 1C).
+Folder name MUST equal meta.name. Copy `props/_template`.
 
 export default { meta, draw(ctx, o, env) }
 

@@ -1,5 +1,5 @@
 // props/_shared/look.js — shared helpers for kit props: theme access, placement, cached sprites, assets, tape, rounded rects.
-// Usage: import { paint, font, place, cached, imageOf, margins, rngFor, drawTape, toRGB, anim } from '../../_shared/look.js';
+// Usage: import { paint, font, place, cached, imageOf, margins, rngFor, drawTape, toRGB, anim } from 'vox-studio/kit/look.js';
 import { sprite, hashStr, seededRandom } from '../../core/helpers.js';
 
 const ALIAS = { tomato: 'accent1', red: 'accent1', cobalt: 'accent2', blue: 'accent2', yellow: 'highlight' };

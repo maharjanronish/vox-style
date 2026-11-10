@@ -42,7 +42,7 @@ export default {
     ctx.save();
     place(ctx, { ...o, x: num(o.x, W / 2), y: num(o.y, (m.top + H - m.bottom) / 2), rot: num(o.rot, -1), scale: num(o.scale, 1) * (0.96 + 0.04 * s) }, env);
     ctx.translate(0, (1 - s) * 70);
-    ctx.globalAlpha *= vis * num(o.opacity, 1);
+    ctx.globalAlpha *= vis;
     dropShadow(ctx, theme, () => ctx.drawImage(spr, -w / 2, -h / 2), {});
     pins.forEach((p, i) => {
       const pp = clamp01((a - 0.3 - i * 0.12) / 0.3);

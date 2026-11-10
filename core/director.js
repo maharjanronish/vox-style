@@ -103,7 +103,7 @@ export function buildTimeline(script, wordsJson = null, { props = null, tail = 0
 
   const ids = new Set();
   const shots = raw.map((r) => {
-    const shot = { index: r.i, line: r.line.id, start: r.start, end: r.end, duration: r.end - r.start, camera: r.s.camera || {}, words: r.line.words };
+    const shot = { index: r.i, line: r.line.id, start: r.start, end: r.end, duration: r.end - r.start, camera: normCam(r.s.camera), words: r.line.words };
     shot.localWords = r.line.words.map((w) => ({ w: w.w, n: w.n, start: w.start - r.start, end: w.end - r.start }));
     shot.layers = (r.s.layers || []).map((L, li) => {
       const out = resolveLayer(L, li, shot, props);
@@ -137,4 +137,11 @@ export function shotAt(tl, T) {
   let lo = 0, hi = S.length - 1;
   while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (S[mid].start <= T) lo = mid; else hi = mid - 1; }
   return S[lo];
+}
+
+/** "drift" | {move} | {type} -> {move,...}. A bare string used to be ignored. */
+function normCam(c) {
+  if (typeof c === 'string') return { move: c };
+  if (c && typeof c === 'object') return c.move || !c.type ? c : { ...c, move: c.type };
+  return {};
 }

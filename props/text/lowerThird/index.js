@@ -39,7 +39,7 @@ export default {
     const right = o.side === 'right';
 
     ctx.save();
-    ctx.globalAlpha *= (1 - x) * num(o.opacity, 1);
+    ctx.globalAlpha *= (1 - x);
     ctx.translate((right ? 1 : -1) * -x * 60 * -1, 0);
 
     // wipe the card in

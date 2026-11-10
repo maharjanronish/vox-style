@@ -36,7 +36,7 @@ export default {
     ctx.save();
     place(ctx, { ...o, rot: tilt - e * 4, scale: num(o.scale, 1) * (0.94 + 0.06 * a) }, env);
     ctx.translate(0, e * 70);
-    ctx.globalAlpha *= vis * num(o.opacity, 1);
+    ctx.globalAlpha *= vis;
     dropShadow(ctx, theme, () => { ctx.fillStyle = paint(theme, 'white'); rrect(ctx, -fw / 2, -fh / 2, fw, fh, 4); ctx.fill(); }, {});
     ctx.drawImage(spr, -fw / 2 + bd, -fh / 2 + bd);
     ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 1.5;

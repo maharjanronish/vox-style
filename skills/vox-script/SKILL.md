@@ -21,17 +21,19 @@ You write ONE file: `projects/<name>/script.json`. Narration lines, shots, props
 ```
 read      CATALOG.md (all) · projects/hk1997/script.json (pattern) · ls assets projects/<p>/assets
 write     narration lines first, then shots
-check     npm run validate -- <p>            repeat until "✔ script is valid"; read every warning
-export    npm run export -- <p>              writes projects/<p>/narration.txt
+check     npm run validate -- <p> --no-dry-run     # no words.json yet
+export    npm run export -- <p>                    # writes projects/<p>/narration.txt
 STOP      tell the user: make audio from narration.txt, put it in projects/<p>/audio/
           (one file named narration.* for all lines, or one per line named by id: l1.wav, l2.wav…)
-align     npm run align -- <p>               read per-line confidence
-check     npm run validate -- <p>            again, now with real timings
+align     npm run align -- <p>
+check     npm run validate -- <p>                  # full: word: cues are resolved here
 draft     npm run make -- <p> --draft
-qa        npm run qa -- <p>                  then LOOK at the images (below)
+qa        npm run qa -- <p>                        # analyses the EXISTING out.draft.mp4, never re-renders
 fix       edit script.json, repeat check → qa
-final     npm run make -- <p>                report the output path that make prints
+final     npm run make -- <p>                      # report the output path that make prints
 ```
+- Always make `--draft` before `qa`. QA is aspect-blind. For 16:9, render at 16:9 first.
+- Fix → repeat steps 6–8.
 - Low-confidence `word:` cue words block `align`. Change the cue word to a distinctive spoken word. Do not use `--allow-low`.
 - `npm run slots -- <prop>` prints one prop's slots, options and example. Use it instead of guessing.
 - QA output is in `projects/<p>/qa/`: `report.txt` (shot table, LONG/EMPTY flags, props used, duration, loudness), `sheet_NN.png` (contact sheets; the red box is the safe area), `shots/shot-NNa.png` (entrance) and `shot-NNb.png` (settled). Open the PNGs. For every shot check: nothing important crosses the red box, annotations sit on their target, no two props collide, text is readable.
@@ -89,6 +91,7 @@ Only each shot's `from` decides where it starts (the previous shot ends there). 
 
 ## 6. Camera
 Always the object form: `"camera": { "move": "push-in" }`. A bare string is not reliably read.
+Verified: only `move` is read. A bare string or `{type:…}` validates but renders as a push-in.
 
 | move | `amount` meaning (default) | notes |
 |---|---|---|
@@ -106,7 +109,7 @@ Do not use `amount: 0.1` on a push-in: that zooms out to 0.1×. Optional `ease`,
 - `"transition": { "type": "paperSlide", "duration": 0.7 }` goes on the shot that **ends** at the cut. It straddles the cut (half before, half after). It is ignored on the last shot.
 - Duration defaults to 0.5 for every type regardless of the prop. Set `0.7` for `paperSlide`; `wipe` is fine at 0.5.
 - Use on topic changes only, 2–3 per ~35 s, and vary the type. Plain cuts are the norm.
-- `"sfx": [ { "type": "pop", "at": "word:flag" } ]`, always the object form with `type` and `at`. Known types: whoosh, slide, paper, swipe, thud, tick, pop, scribble. Most props add their own sound automatically (stamp→thud, clip/photo/map→paper, highlighter→swipe, circle→scribble, number/chart→pop, lower third→slide, wipe→whoosh, paperSlide→slide), so add `sfx` only to emphasise a moment. The cue must fall inside the shot.
+- `"sfx": [{ "type":"pop", "at":"word:flag", "gain":0.8 }]`. Always use an array of objects. A bare string works in the mix but makes the director throw. An `at` the mix can't resolve is silently dropped. Known types: whoosh, slide, paper, swipe, thud, tick, pop, scribble. Most props add their own sound automatically (stamp→thud, clip/photo/map→paper, highlighter→swipe, circle→scribble, number/chart→pop, lower third→slide, wipe→whoosh, paperSlide→slide), so add `sfx` only to emphasise a moment. The cue must fall inside the shot.
 
 ## 8. Captions
 `caps` is optional (auto-chunks to ≤ 4 words on punctuation if absent).
@@ -131,14 +134,19 @@ Pick by intent; the catalog's "Choosing props" table and each prop's **avoid** l
 - `paperPhoto`: at most 2 photos on screen. A real photo beats a graphic.
 - Text-heavy props (clip, lower third, chart title): max 2 on screen at once; give older ones `until`.
 - `imageTimelineCard` and `timelineTrack` are the user's experimental props. Do not use them unless asked.
+- A project-local prop with a kit prop's name replaces it for that project. A project-local transition needs `meta.category: 'transitions'`.
 
 **Recipes** (`## Recipes` in the catalog) are copy-paste shot snippets, not script keys. Copy the snippet into `shots[]`, add `"line"` (and `span` if needed), replace every `{{param}}`. Replace the whole quoted placeholder for non-strings: `"highlight": "{{highlight}}"` becomes `"highlight": 3`, and `"data": "{{data}}"` becomes the array. `"at": "word:{{cueWord}}"` becomes e.g. `"at": "word:156"`. Convert any `"camera": "push-in"` in a snippet to the object form.
 
 ## 10. Maps and annotations
 **baseMap:** `slots.focus` is an array of place names; `slots.pins` is `[{lon, lat, label, side?}]` (max 5; the only `side` value seen is `"left"`); `options.bbox` is `[west, south, east, north]` in degrees.
+Verified: `Hong Kong` and `Macao` exist.
 - Valid names come from Natural Earth. **Never guess**: run `npm run geo:names -- <text>` (for example `hong`, `macao`). It prints each name and its bounding box. A name that is not in the data highlights nothing and raises no error.
 - Use a tight bbox. Never a world-scale map.
 - The map card fills much of the frame. Check in QA that pins and labels do not cross the red box.
+- Pins: `side` is only meaningful as `"left"`, and the maximum is 8. Pins outside `bbox` vanish silently, so check them in QA.
+- Setting `bbox` also sets the map's shape. Hong Kong with `[112.3,20.7,115.8,24.1]` is nearly square.
+- Hong Kong and Macao exist in the data.
 
 **highlighter / markerCircle:** `x y w h` describe the **target** on screen, not the stroke. You cannot know where another prop draws its content, so the loop is mandatory:
 1. Place the annotation with a best guess (percent values).
@@ -152,6 +160,7 @@ Pick by intent; the catalog's "Choosing props" table and each prop's **avoid** l
 - Open with a hook (a number or a claim). Close on the point: a stamp, a big number or a pull-out.
 - Prefer a photo or a big number over a paragraph. Clip headline under 10 words; body under 35.
 - 9:16 content area: x 70–1010, y 150–1440 (the bottom 480 px is for captions and platform UI). 16:9: x 110–1810, y 70–850.
+- The safe-area lint is narrow, so rely on the QA images for placement checks.
 
 | Message (abridged) | Fix |
 |---|---|
@@ -169,6 +178,7 @@ Pick by intent; the catalog's "Choosing props" table and each prop's **avoid** l
 | `camera.move "X" unknown` | Use one of the 10 moves. |
 | `duplicate layer id` / `duplicate line id` | Make them unique script-wide. |
 | `words.json has no line "L"` | The script changed after align. Re-export, redo audio, re-align. |
+| `director dry-run failed: ENOENT: words.json` | Use `--no-dry-run`, or run align first. |
 | `N text-heavy layers (max 2 at once)` | Add `until` to the older ones or drop one. |
 | `text layer extends outside the safe area` | Move or shrink it (this check ignores camera movement). |
 
@@ -182,12 +192,9 @@ Pick by intent; the catalog's "Choosing props" table and each prop's **avoid** l
 - [ ] MISSING PROPS listed if you compromised.
 
 ## Unverified: test with validate/QA and tell the user, never state as fact
-- **sfx entries:** bare strings and a `gain`/`volume` field (the catalog says `gain`, the director reads `volume`).
 - **16:9:** selection at render time (`meta.aspect` vs a `--aspect` flag on `make`). Validate documents `--aspect`.
 - **Layer order:** how `z` combines with array order.
 - **Default placement** of world props with no `x/y`.
 - **Lint limits:** exact text-heavy weight (threshold 40) and the quiet-gap limit (3).
 - **Final render with missing assets:** whether `make` (no `--draft`) refuses.
-- **baseMap:** default bbox when omitted; case handling of `focus` names; `pins.side` values other than `left`.
-- **Pre-audio QA:** whether `qa` runs before `words.json` exists (validate's dry-run uses estimated timing).
-- **Camera as a bare string:** treated as push-in unless normalised somewhere I have not read. Recipes and `test3` use it.
+- **baseMap:** default bbox when omitted.

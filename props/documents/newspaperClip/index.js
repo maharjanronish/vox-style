@@ -41,7 +41,7 @@ export default {
     ctx.save();
     place(ctx, { ...o, x: num(o.x, W / 2), y: num(o.y, (m.top + H - m.bottom) / 2), rot: tilt - (1 - s) * 3, scale: num(o.scale, 1) * (0.95 + 0.05 * s) }, env);
     ctx.translate(0, (1 - s) * 90);
-    ctx.globalAlpha *= vis * num(o.opacity, 1);
+    ctx.globalAlpha *= vis;
 
     dropShadow(ctx, theme, () => { ctx.fillStyle = paint(theme, 'paperDark'); tornPath(ctx, cw, ch, rngFor(env, 'tear'), 5, 26); ctx.fill(); }, {});
     ctx.fillStyle = 'rgba(255,253,248,0.35)';

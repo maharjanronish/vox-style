@@ -22,7 +22,7 @@ export default {
     const sw = Math.ceil(W * 1.5), sh = Math.ceil(H * 1.5);
     const spr = cached(env, `paperBg:${variant}:${o.tint ?? ''}:${sw}x${sh}`, sw, sh, (c, w, h) => paintPaper(c, w, h, variant, o.tint, env));
     ctx.save();
-    ctx.globalAlpha *= vis * num(o.opacity, 1);
+    ctx.globalAlpha *= vis;
     ctx.drawImage(spr, num(o.x, W / 2) - sw / 2, num(o.y, H / 2) - sh / 2);
     ctx.restore();
   },

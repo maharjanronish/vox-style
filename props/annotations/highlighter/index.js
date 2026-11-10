@@ -19,7 +19,7 @@ export default {
     if (a <= 0.001 || x >= 1) return;
     ctx.save();
     place(ctx, { ...o, x: num(o.x, W / 2), y: num(o.y, H / 2) }, env);
-    ctx.globalAlpha *= (1 - x) * num(o.opacity, 1);
+    ctx.globalAlpha *= (1 - x);
     highlightBar(ctx, num(o.w, 500), num(o.h, 70), outCubic(clamp01(a)), rngFor(env, 'hl'), paint(theme, o.color, 'highlight'));
     ctx.restore();
   },

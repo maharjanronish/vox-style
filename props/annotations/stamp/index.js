@@ -31,7 +31,7 @@ export default {
 
     ctx.save();
     place(ctx, { ...o, x: num(o.x, W / 2), y: num(o.y, (m.top + H - m.bottom) / 2), rot: num(o.rot, -8), scale: num(o.scale, 1) * sc }, env);
-    ctx.globalAlpha *= vis * num(o.opacity, 1);
+    ctx.globalAlpha *= vis;
     ctx.globalCompositeOperation = 'multiply';
     ctx.drawImage(spr, -sw / 2, -sh / 2);
     ctx.restore();

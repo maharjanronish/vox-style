@@ -665,9 +665,12 @@ async function dryRun({ root, project, aspect, defs }) {
     Object.assign(new Error(`ENOENT: ${p}`), { code: 'ENOENT' });
 
   return loadProject({
-    readJSON: async (p) => {
+    readJSON: async (p, opts = {}) => {
       const f = find(p);
-      if (!f) throw noFile(p);
+      if (!f) {
+        if (opts.optional) return null;
+        throw noFile(p);
+      }
       return JSON.parse(fs.readFileSync(f, 'utf8'));
     },
     loadImage: async (p) => {

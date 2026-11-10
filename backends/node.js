@@ -86,7 +86,14 @@ export async function loadNodeProject({ project, aspect = '9:16', strict = true,
 };
   const noFile = (p) => Object.assign(new Error(`ENOENT: ${p}`), { code: 'ENOENT' });
   const loaded = await loadProject({
-    readJSON: async (p) => { const f = find(p); if (!f) throw noFile(p); return JSON.parse(fs.readFileSync(f, 'utf8')); },
+    readJSON: async (p, opts = {}) => {
+      const f = find(p);
+      if (!f) {
+        if (opts.optional) return null;
+        throw noFile(p);
+      }
+      return JSON.parse(fs.readFileSync(f, 'utf8'));
+    },
     loadImage: async (p) => { const f = find(p); if (!f) throw noFile(p); return be.loadImage(f); },
     createCanvas: be.createCanvas,
     resolvePath: (p) => find(p) ?? p,

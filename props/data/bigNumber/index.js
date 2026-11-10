@@ -30,7 +30,7 @@ export default {
     ctx.save();
     place(ctx, { ...o, x: num(o.x, W / 2), y: num(o.y, (m.top + H - m.bottom) / 2), rot: num(o.rot, -2), scale: num(o.scale, 1) * (0.85 + 0.15 * s) }, env);
     ctx.translate(0, (1 - s) * 60);
-    ctx.globalAlpha *= vis * num(o.opacity, 1);
+    ctx.globalAlpha *= vis;
     if (o.highlight !== false) {
       ctx.save();
       ctx.translate(0, ny + fs * 0.3);

@@ -22,7 +22,7 @@ export default {
     const upto = clamp01(a) * (pts.length - 1);
     ctx.save();
     ctx.translate(num(o.x, W / 2), num(o.y, H / 2));
-    ctx.globalAlpha *= (1 - x) * num(o.opacity, 1);
+    ctx.globalAlpha *= (1 - x);
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     ctx.strokeStyle = paint(theme, o.color, 'accent1');
     for (let i = 0; i < pts.length - 1 && i < upto; i++) {

@@ -33,7 +33,7 @@ You write ONE file: `projects/<name>/script.json` (narration lines, shots, props
 - One idea per shot. Prefer a photo or a big number over a paragraph.
 
 ## Sound effects (`shot.sfx`)
-`"sfx": ["whoosh"]` or `[{ "type": "thud", "at": "word:agreed", "gain": 0.8 }]`. `at` uses the same cue grammar as layers (`start`, `end`, `t:1.2`, `word:x`, optional `+0.2s`); `t:` is relative to the shot start.
+`"sfx":[{ "type": "thud", "at": "word:agreed", "gain": 0.8 }]`. `at` uses the same cue grammar as layers (`start`, `end`, `t:1.2`, `word:x`, optional `+0.2s`); `t:` is relative to the shot start.
 Known sounds: `whoosh`, `slide`, `paper`, `swipe`, `thud`, `tick`, `pop`, `scribble`. Unknown names fall back to `tick` with a warning.
 Automatic (no need to write): stamp→thud, newspaperClip/paperPhoto/baseMap→paper, highlighter→swipe, markerCircle→scribble, bigNumber/barChart→pop, lowerThird→slide, wipe→whoosh, paperSlide→slide. Disable with `npm run sfx -- <project> --no-auto`.
 
