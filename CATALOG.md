@@ -130,7 +130,9 @@ Pick by purpose; details are in the reference below.
 | A cut-paper map of a region. | `baseMap` | maps | Maps with more than 5 pins, world-scale maps (use a tight bbox), or relying on a name that is not in Natural Earth (a misspelt focus name simply highlights nothing). |
 | A real photo as a taped paper print with a soft shadow and a small tilt. | `paperPhoto` | photos | Screenshots full of text, or more than two photos on screen at once. |
 | Identify a person or place with a name and an optional title. | `lowerThird` | text | Long sentences (names and short titles only), or using it for general text; use it once per person. |
-| One continuous documentary timeline connecting multiple photographs, historical events, documents or milestones. | `timelineTrack` | timelines | Do not create separate tracks for events belonging to one chronological sequence or use as an ordinary decorative underline. |
+| A calendar sheet that shows one exact date: month on a coloured band, a big day number, weekday and year. | `calendarPage` | timelines | Showing several dates (use timeline), or a date without a day (use bigNumber for a year). |
+| A paper clock face whose hands sweep round to a given time, with a typed digital readout. | `clock` | timelines | Showing the passing of years (use timeline), or more than one clock at once. |
+| Dated events revealed one by one along a hand-drawn line, each with a kraft date tag and a short label. | `timeline` | timelines | More than 8 nodes, labels longer than about 10 words, or a bare line with dots and no text (use timelineTrack). |
 | Two torn paper sheets (tomato under kraft) sweep right-to-left across the frame. | `paperSlide` | transitions | Using it on every cut, or durations under 0.5 s (the torn edges need time to read). |
 | A clean straight wipe between two shots; the neutral default. | `wipe` | transitions | Using the same transition on every cut (vary it with paperSlide), or durations under 0.3 s. |
 
@@ -766,35 +768,86 @@ _default duration 3.5s · space: screen_
 
 ### timelines
 
-#### timelineTrack
+#### calendarPage
 
-**Use:** One continuous documentary timeline connecting multiple photographs, historical events, documents or milestones.
+**Use:** A calendar sheet that shows one exact date: month on a coloured band, a big day number, weekday and year. Give the date as "YYYY-MM-DD". Good for "On July 1st, 1997..." moments.
 
-**Do not:** Do not create separate tracks for events belonging to one chronological sequence or use as an ordinary decorative underline.
+**Do not:** Showing several dates (use timeline), or a date without a day (use bigNumber for a year).
 
-_default duration 5s · space: world_
+_default duration 3s · space: world · default depth: 0.5_
 
 **Slots** (content):
 
-_None._
+| Name | Type | Notes |
+|---|---|---|
+| `date` | `string` |  |
 
 **Options:**
 
 | Name | Type | Default | Notes |
 |---|---|---|---|
-| `points` | `any` | — |  |
-| `markers` | `any?` | — |  |
+| `weekday` | `boolean?` | — |  |
 | `color` | `color?` | — |  |
-| `width` | `number?` | — |  |
-| `wobble` | `number?` | — |  |
-| `markerRadius` | `number?` | — |  |
-| `markerBorder` | `number?` | — |  |
-| `smoothness` | `range:4..40?` | — |  |
 
 **Example layer:**
 
 ```json
-{"prop":"timelineTrack","slots":{},"options":{"points":{"portrait":[{"x":0.5,"y":0.08},{"x":0.5,"y":0.3},{"x":0.46,"y":0.5},{"x":0.5,"y":0.7},{"x":0.5,"y":0.92}],"landscape":[{"x":0.5,"y":0.05},{"x":0.5,"y":0.25},{"x":0.46,"y":0.5},{"x":0.5,"y":0.75},{"x":0.5,"y":0.95}]},"markers":{"portrait":[{"x":0.5,"y":0.3},{"x":0.5,"y":0.7}],"landscape":[{"x":0.5,"y":0.25},{"x":0.5,"y":0.75}]},"color":"#B45B43","width":5,"wobble":2,"markerRadius":14,"markerBorder":3,"smoothness":20},"at":"start"}
+{"prop":"calendarPage","slots":{"date":"1997-07-01"},"options":{"color":"accent1"},"at":"start"}
+```
+
+#### clock
+
+**Use:** A paper clock face whose hands sweep round to a given time, with a typed digital readout. For "at 23:59", "one minute to midnight", deadlines and countdowns. Give time as "HH:MM" (24 h) or "11:59 pm".
+
+**Do not:** Showing the passing of years (use timeline), or more than one clock at once.
+
+_default duration 3.5s · space: world · default depth: 0.5_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `time` | `string` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `digital` | `boolean?` | — |  |
+| `color` | `color?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"clock","slots":{"time":"23:59"},"options":{"digital":true,"color":"accent1"},"at":"start"}
+```
+
+#### timeline
+
+**Use:** Dated events revealed one by one along a hand-drawn line, each with a kraft date tag and a short label. Vertical in 9:16, horizontal in 16:9. Give 2 to 8 nodes as { date, label }; nodes arrive evenly over the layer "enter" time, so set enter to about the length of the narration for the list. focus highlights one node (counting from 1).
+
+**Do not:** More than 8 nodes, labels longer than about 10 words, or a bare line with dots and no text (use timelineTrack).
+
+_default duration 6s · space: world · default depth: 0.5_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `nodes` | `array` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `dir` | `enum:auto\|vertical\|horizontal` | — |  |
+| `focus` | `number?` | — |  |
+| `color` | `color?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"timeline","slots":{"nodes":[{"date":"1842","label":"Hong Kong Island ceded to Britain"},{"date":"1898","label":"99-year lease on the New Territories"},{"date":"1997","label":"Handover to China"}]},"options":{"focus":3},"at":"start"}
 ```
 
 ### transitions
