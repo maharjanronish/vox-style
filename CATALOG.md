@@ -109,13 +109,21 @@ Pick by purpose; details are in the reference below.
 
 | Need | Prop | Category | Do not |
 |---|---|---|---|
+| A hand-drawn marker arrow that draws itself and points at something: a face in a photo, a number, a place on a map. | `arrow` | annotations | More than two at once, or arrows with no clear target. |
+| A short label on a torn paper slip, joined by a hand-drawn line to a ring on the thing it describes. | `callout` | annotations | Long text (keep under about 10 words), more than two at once, or labels with no clear target (use paperScrap). |
+| A marker tick that draws itself, alone or inside a hand-drawn circle or box. | `checkMark` | annotations | More than three at once, or ticks with nothing next to them to confirm. |
+| A marker X, strike-through line or scribble drawn over a photo, a word or a number to say "wrong", "gone" or "abolished". | `crossOut` | annotations | Using it on more than one thing at a time, or as decoration with nothing to reject. |
 | A highlighter swipe across something already on screen (a line of text, a number, part of a photo). | `highlighter` | annotations | Highlighting empty space, more than one target at once, or using it as a background. |
 | Draw attention to something already on screen with a hand-drawn marker stroke (circle, underline or box) that draws itself. | `markerCircle` | annotations | Circling empty space, or using more than one at a time. |
 | Slam a rubber-stamp word (APPROVED, CLASSIFIED, 1997) onto the page for a verdict or a punchline. | `stamp` | annotations | More than 3 words, more than one stamp at a time, or stamping before the thing it judges is on screen. |
+| A marker underline drawn under a key word, name or number. | `underline` | annotations | Use highlighter for a filled bar behind text and markerCircle to ring something. |
 | Textured paper backdrop (plain, grid, lined, dots or kraft). | `paperBg` | backgrounds | Stacking two backgrounds in one shot, or expecting it to carry content; it is only a surface. |
 | A plain colour (optionally graph-paper) backdrop when a shot needs no texture, photo, or map behind it. | `solidBg` | backgrounds | Do not stack two backgrounds in one shot; do not use it where a handmade paper look is wanted (use paperBg). |
 | A documentary photograph card for presenting historical events, important discoveries, milestones or visual evidence. | `imageTimelineCard` | cards | Do not use for full-screen photographs, complex multi-event timelines or decorative backgrounds. |
-| A person, place or object cut out of its photo like paper: irregular scissor-cut off-white rim, paper thickness, soft shadow, desaturated or halftone photo, optional torn backing. | `stickerCutout` | collage | More than two cutouts at once, a traced "poly" outline on hair or fine detail (supply a transparent PNG instead), or photos that need their whole frame (use paperPhoto). |
+| Short text on a torn scrap of paper, like a cut-out headline or a handwritten label: names, dates, one-line claims. | `paperScrap` | collage | Paragraphs (keep under about 8 words), more than two at once, or text that must be read for long (use quoteCard or lowerThird). |
+| A photo as an instant print: off-white frame, thicker bottom edge with a typed caption, a strip of tape on top. | `polaroid` | collage | Cutting out a person or object (use stickerCutout), more than three at once, or long captions (keep under about 40 characters). |
+| A person, place or object cut out of its photo like paper: irregular scissor-cut off-white rim, paper thickness, soft shadow, desaturated or halftone photo, optional torn backing. | `stickerCutout` | collage | More than two cutouts at once, a traced "poly" outline on hair or fine detail (supply a transparent PNG instead), or photos that need their whole frame (use paperPhoto or polaroid). |
+| A short typed label on a strip of masking tape: "EXHIBIT A", a date, a name. | `tapeLabel` | collage | Long text (keep under about 24 characters), or using it as the main title (use paperScrap or a title prop). |
 | Compare 2–6 values with paper-cut bars on a card; bars grow in and the numbers count up. | `barChart` | data | More than 8 bars, labels longer than about 10 characters, or mixed units. |
 | One huge number or year as the star of the shot, with a short label under it. | `bigNumber` | data | More than one number at once (use barChart to compare), labels longer than about 6 words, or very long values. |
 | A torn newspaper clipping with a serif headline and a few lines of body text. | `newspaperClip` | documents | Long articles (headline under 10 words, body under 35), two clippings at once, or leaving it on screen for more than about 4 s. |
@@ -131,6 +139,119 @@ Pick by purpose; details are in the reference below.
 A `?` after a type means optional. Slots are content; options are look and placement.
 
 ### annotations
+
+#### arrow
+
+**Use:** A hand-drawn marker arrow that draws itself and points at something: a face in a photo, a number, a place on a map. x and y are where the tip lands; dir is the direction it points (0 right, 90 down, -90 up).
+
+**Do not:** More than two at once, or arrows with no clear target. Use callout when the arrow needs a label.
+
+_default duration 2.5s · space: world · default depth: 0.8_
+
+**Slots** (content):
+
+_None._
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `dir` | `number?` | — |  |
+| `length` | `length?` | — |  |
+| `curve` | `number?` | — |  |
+| `color` | `color?` | — |  |
+| `width` | `number?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"arrow","slots":{},"options":{"dir":40,"length":360,"curve":0.25,"color":"accent1"},"at":"start"}
+```
+
+#### callout
+
+**Use:** A short label on a torn paper slip, joined by a hand-drawn line to a ring on the thing it describes. x and y are the target; side says where the label sits (auto picks one). Use for "this is the flag", "he was 27".
+
+**Do not:** Long text (keep under about 10 words), more than two at once, or labels with no clear target (use paperScrap).
+
+_default duration 3s · space: world · default depth: 0.8_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `text` | `string` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `side` | `enum:auto\|left\|right\|top\|bottom` | — |  |
+| `gap` | `number?` | — |  |
+| `size` | `number?` | — |  |
+| `face` | `enum:text\|typed\|display` | — |  |
+| `fill` | `color?` | — |  |
+| `color` | `color?` | — |  |
+| `width` | `number?` | — |  |
+| `curve` | `number?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"callout","slots":{"text":"Last flag lowered"},"options":{"side":"bottom","gap":130},"at":"start"}
+```
+
+#### checkMark
+
+**Use:** A marker tick that draws itself, alone or inside a hand-drawn circle or box. Good for confirmed facts, pro/con lists and "this one is right". w sets the size.
+
+**Do not:** More than three at once, or ticks with nothing next to them to confirm.
+
+_default duration 2s · space: world · default depth: 0.8_
+
+**Slots** (content):
+
+_None._
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `shape` | `enum:none\|circle\|box` | — |  |
+| `color` | `color?` | — |  |
+| `width` | `number?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"checkMark","slots":{},"options":{"shape":"circle","color":"accent2"},"at":"start"}
+```
+
+#### crossOut
+
+**Use:** A marker X, strike-through line or scribble drawn over a photo, a word or a number to say "wrong", "gone" or "abolished". Set x, y, w, h to cover the thing.
+
+**Do not:** Using it on more than one thing at a time, or as decoration with nothing to reject.
+
+_default duration 2s · space: world · default depth: 0.8_
+
+**Slots** (content):
+
+_None._
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `style` | `enum:x\|strike\|scribble` | — |  |
+| `color` | `color?` | — |  |
+| `width` | `number?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"crossOut","slots":{},"options":{"style":"x","color":"accent1"},"at":"start"}
+```
 
 #### highlighter
 
@@ -207,6 +328,32 @@ _default duration 1.6s · space: world · default depth: 0.7_
 
 ```json
 {"prop":"stamp","slots":{"text":"HANDOVER"},"options":{"shape":"box"},"at":"start"}
+```
+
+#### underline
+
+**Use:** A marker underline drawn under a key word, name or number. x and y are the centre of the line, w its width. Place it just below the text it emphasises.
+
+**Do not:** Use highlighter for a filled bar behind text and markerCircle to ring something. Do not stack more than two underlines on screen.
+
+_default duration 2s · space: world · default depth: 0.8_
+
+**Slots** (content):
+
+_None._
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `style` | `enum:single\|double\|wave` | — |  |
+| `color` | `color?` | — |  |
+| `width` | `number?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"underline","slots":{},"options":{"style":"double","color":"accent1"},"at":"start"}
 ```
 
 ### backgrounds
@@ -311,11 +458,69 @@ _default duration 4s · space: world_
 
 ### collage
 
+#### paperScrap
+
+**Use:** Short text on a torn scrap of paper, like a cut-out headline or a handwritten label: names, dates, one-line claims. Kraft by default; use an accent colour for emphasis.
+
+**Do not:** Paragraphs (keep under about 8 words), more than two at once, or text that must be read for long (use quoteCard or lowerThird).
+
+_default duration 3s · space: world · default depth: 0.6_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `text` | `string` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `face` | `enum:display\|typed\|text` | — |  |
+| `size` | `number?` | — |  |
+| `color` | `color?` | — |  |
+| `textColor` | `color?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"paperScrap","slots":{"text":"THE LAST DAY"},"options":{"face":"display"},"at":"start"}
+```
+
+#### polaroid
+
+**Use:** A photo as an instant print: off-white frame, thicker bottom edge with a typed caption, a strip of tape on top. Good for dated archive shots, evidence and personal moments.
+
+**Do not:** Cutting out a person or object (use stickerCutout), more than three at once, or long captions (keep under about 40 characters).
+
+_default duration 3.5s · space: world · default depth: 0.5_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `src` | `asset` |  |
+| `caption` | `string?` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `look` | `enum:bw\|muted\|color\|halftone` | — |  |
+| `ratio` | `number?` | — |  |
+| `mount` | `enum:tape\|none` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"polaroid","slots":{"src":"assets/sample/skyline.png","caption":"Victoria Harbour, 1997"},"options":{"look":"bw"},"at":"start"}
+```
+
 #### stickerCutout
 
 **Use:** A person, place or object cut out of its photo like paper: irregular scissor-cut off-white rim, paper thickness, soft shadow, desaturated or halftone photo, optional torn backing. Best with a transparent PNG (cut "alpha"); use "scissor" for ordinary photos and "poly" to trace an outline.
 
-**Do not:** More than two cutouts at once, a traced "poly" outline on hair or fine detail (supply a transparent PNG instead), or photos that need their whole frame (use paperPhoto).
+**Do not:** More than two cutouts at once, a traced "poly" outline on hair or fine detail (supply a transparent PNG instead), or photos that need their whole frame (use paperPhoto or polaroid).
 
 _default duration 3.5s · space: world · default depth: 0.5_
 
@@ -343,6 +548,34 @@ _default duration 3.5s · space: world · default depth: 0.5_
 
 ```json
 {"prop":"stickerCutout","slots":{"src":"assets/sample/skyline.png"},"options":{"cut":"scissor","rim":10,"look":"halftone"},"at":"start"}
+```
+
+#### tapeLabel
+
+**Use:** A short typed label on a strip of masking tape: "EXHIBIT A", a date, a name. Stick it across the corner of a polaroid or cutout with x and y.
+
+**Do not:** Long text (keep under about 24 characters), or using it as the main title (use paperScrap or a title prop).
+
+_default duration 3s · space: world · default depth: 0.7_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `text` | `string` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `color` | `color?` | — |  |
+| `textColor` | `color?` | — |  |
+| `size` | `number?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"tapeLabel","slots":{"text":"EXHIBIT A"},"options":{},"at":"start"}
 ```
 
 ### data
