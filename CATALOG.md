@@ -118,6 +118,7 @@ Pick by purpose; details are in the reference below.
 | Slam a rubber-stamp word (APPROVED, CLASSIFIED, 1997) onto the page for a verdict or a punchline. | `stamp` | annotations | More than 3 words, more than one stamp at a time, or stamping before the thing it judges is on screen. |
 | A marker underline drawn under a key word, name or number. | `underline` | annotations | Use highlighter for a filled bar behind text and markerCircle to ring something. |
 | Textured paper backdrop (plain, grid, lined, dots or kraft). | `paperBg` | backgrounds | Stacking two backgrounds in one shot, or expecting it to carry content; it is only a surface. |
+| A photo of the place or era behind the scene, washed toward paper so the props on top stay readable. | `photoBg` | backgrounds | Two backgrounds at once (except paperBg under mode sheet), a very busy photo behind text-heavy props (raise wash to 0.7), or tiny low-resolution photos. |
 | A plain colour (optionally graph-paper) backdrop when a shot needs no texture, photo, or map behind it. | `solidBg` | backgrounds | Do not stack two backgrounds in one shot; do not use it where a handmade paper look is wanted (use paperBg). |
 | Short text on a torn scrap of paper, like a cut-out headline or a handwritten label: names, dates, one-line claims. | `paperScrap` | collage | Paragraphs (keep under about 8 words), more than two at once, or text that must be read for long (use quoteCard or lowerThird). |
 | A photo as an instant print: off-white frame, thicker bottom edge with a typed caption, a strip of tape on top. | `polaroid` | collage | Cutting out a person or object (use stickerCutout), more than three at once, or long captions (keep under about 40 characters). |
@@ -386,6 +387,37 @@ _None._
 
 ```json
 {"prop":"paperBg","slots":{},"options":{"variant":"grid"},"at":"start"}
+```
+
+#### photoBg
+
+**Use:** A photo of the place or era behind the scene, washed toward paper so the props on top stay readable. Fills the empty space of a shot: put it first, keep depth low (about 0.1) and put stickers at high depth (about 0.9) so the camera makes them move at different speeds. mode "full" fills the frame, "sheet" is a torn paper sheet (put paperBg under it). focus [x,y] picks which part of the photo stays in frame.
+
+**Do not:** Two backgrounds at once (except paperBg under mode sheet), a very busy photo behind text-heavy props (raise wash to 0.7), or tiny low-resolution photos.
+
+_default duration 4s · space: world · default depth: 0.1_
+
+**Slots** (content):
+
+| Name | Type | Notes |
+|---|---|---|
+| `src` | `asset` |  |
+
+**Options:**
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `mode` | `enum:full\|sheet?` | — |  |
+| `look` | `enum:bw\|muted\|color\|halftone?` | — |  |
+| `wash` | `range:0..0.9?` | — |  |
+| `focus` | `array?` | — |  |
+| `drift` | `range:0..0.08?` | — |  |
+| `tint` | `color?` | — |  |
+
+**Example layer:**
+
+```json
+{"prop":"photoBg","slots":{"src":"assets/sample/skyline.png"},"options":{"mode":"full","look":"muted","wash":0.5},"at":"start"}
 ```
 
 #### solidBg
